@@ -23,6 +23,8 @@ Team Members:
 
 ## Technical Architecture
 
+## Detailed Architecture
+
 ## Alternative Solutions
 
 ## Testing
