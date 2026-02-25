@@ -9,17 +9,17 @@ Team Members:
 - Sandra Banaszak
 - Elizabeth Fuller
 - Savlatjon Khuseynov
-- Kangjie Mi
 - James Ritter
+- Kangjie Mi
 - Dana Zhang
 
 ## Overview & Context
 
 This is a Design Document describes the architecture, module breakdown, function specifications, data flow, and implementation plan for a team-developed ARM Assembly program that implements the RSA (Rivest-Shamir-Adleman) public-key cryptographic algorithm. The document serves as a collaborative blueprint to guide implementation and ensure all team members share a unified understanding before coding begins.
 
-TODO: Add information about the math behind the algorithm (~1 paragraph)
+TODO: Add information about the math behind the algorithm (~1 paragraph) (Savlatjon / Sandra)
 
-## Scope & Responsibilities
+## Scope & Responsibilities (James)
 
 ### In Scope
 
@@ -40,35 +40,41 @@ TODO: Summarize the project requirements document and explain the general workfl
 
 ## Goals & Milestones
 
-Goal 1:
+### Goals (James)
 
-## Proposed Solution & Use Cases
+- Milestone : Complete Software Design Doc & Technical Architecture Plan
+- Milestone : Display Prompts for User Actions
+- Milestone : Generate Public & Private Keys
+- Milestone : Encrypt a Message
+- Milestone : Decrypt a Message
+- Milestone : Collaborate with another group to test our program
+
+## Proposed Solution & Use Cases (Elizabeth)
 
 ## Technical Architecture
 
-<<<<<<< HEAD
-### TODO: Add diagrams here
+### TODO: Add diagrams here (James w/ input from the group)
 
-### TODO: Add detailed function definitions
-=======
-## Detailed Architecture
->>>>>>> refs/remotes/origin/main
+### TODO: Add detailed function definitions here (All team members)
 
-## Alternative Solutions
-
-## Testing
+## Testing (Savlatjon)
 
 ### TODO: Unit testing strategy
 
 ## Open Questions
 
-## Timeline
+## Timeline (Elizabeth)
+
+Software Design Doc Due: Mar 1
+
+Try to coordinate w/ another group by April 15
+Final Project Due: May 3
 
 ## Team Roles & Responsibilities
 
-- Sandra Banaszak
-- Elizabeth Fuller
-- Savlatjon Khuseynov
-- Kangjie Mi
-- James Ritter
-- Dana Zhang
+- Sandra Banaszak - Encrypt/Decrypt (RSA Lib pow(), mod())
+- Elizabeth Fuller - Generate Public (RSA Lib gcd(), calc_n(), calc_phi(), cpubexp())
+- Savlatjon Khuseynov - UI/Orchestration Portion (RSA Lib isPrime())
+- James Ritter - Generate Private Keys (RSA Lib cprivexp()), I/O
+- Kangjie Mi -
+- Dana Zhang -

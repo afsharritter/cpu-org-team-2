@@ -1,0 +1,62 @@
+title Generate Keys Sequence
+autoNumber off
+
+
+user [icon: monitor, label: "User"]
+orch [icon: monitor, color: gray, label: "RSA Orchestrator"]
+rsa [icon: gear, color: blue, label: "RSA Lib"]
+fs [icon: folder, color: yellow, label: "File System"]
+
+user > orch: Run RSA.s
+orch > user: Prompt menu
+Keys [label: "1. Generate Keys"] {
+  user > orch: Select 1. Generate Keys
+  loop [label: "until isPrime(p) == true"] {
+    orch <> user: Prompt p
+    orch > rsa: isPrime(p)
+    alt [label: "prime"] {
+      rsa > orch: return 1   // or true
+    }
+    else [label: "not prime"] {
+      rsa > orch: return 0   // or false
+      orch > user: Display "p is not prime"
+    }
+  }
+  loop [label: "until isPrime(q) == true"] {
+    orch <> user: Prompt q
+    orch > rsa: isPrime(q)
+    alt [label: "prime"] {
+      rsa > orch: return 1   // or true
+    }
+    else [label: "not prime"] {
+      rsa > orch: return 0   // or false
+      orch > user: Display "q is not prime"
+    }
+  }
+  Public Key [label: "Public Key"] {
+    loop [label: "until cpubexp(p,q,e) returns status code 0"] {
+      orch <> user: Prompt e
+      orch > rsa: call cpubexp(p, q, e)
+      rsa > rsa: calc_n(p, q)
+      rsa > rsa: calc_phi(p, q)
+      rsa > rsa: isValid_e(e)
+      rsa > rsa: gcd(e, phi)
+      alt [label: "is valid e"] {
+        rsa > orch: return 0, n, phi, e
+      } else [label: "is invalid e"] {
+        rsa > orch: return 1
+        orch > user: Display "e is not valid"
+      }
+    }
+  }
+  Private Key [label: "Private Key"] {
+    orch > rsa: Call cprivexp(e, phi)
+    rsa > rsa: modinv(e, phi)
+    rsa > orch: return d
+  }
+  
+  orch > user: Display n, e, d
+  orch > fs: Save keys.txt 
+}
+
+
