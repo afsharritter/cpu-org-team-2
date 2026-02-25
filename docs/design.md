@@ -58,7 +58,14 @@ Goal 1:
 
 ## Testing
 
-### TODO: Unit testing strategy
+Test Key Generation
+Test1 |	p | q 	Expected Behavior	                         Status
+Test2 | 7 | 11	Both prime, n=77; proceed to e entry.	     PASS
+Test3 | 11| 13	Both prime, n=143; recommended key set.	   PASS
+Test4 |	4 |	11	p=4 not prime; prompt user to re-enter p.	 FAIL
+Test5 |	7 |	9	  q=9 not prime; prompt user to re-enter q.	 FAIL
+Test6 |	1 |	1	  Both rejected (1 is not prime).	           FAIL
+
 
 ## Open Questions
 
