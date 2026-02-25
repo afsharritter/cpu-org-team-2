@@ -46,9 +46,13 @@ Goal 1:
 
 ## Technical Architecture
 
+<<<<<<< HEAD
 ### TODO: Add diagrams here
 
 ### TODO: Add detailed function definitions
+=======
+## Detailed Architecture
+>>>>>>> refs/remotes/origin/main
 
 ## Alternative Solutions
 
