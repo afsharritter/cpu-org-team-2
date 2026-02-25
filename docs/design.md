@@ -14,7 +14,7 @@ Team Members:
 - Dana Zhang
 
 ## Overview & Context
-This is a Design Document describes the architecture, module breakdown, function specifications, data flow, and implementation plan for a team-developed ARM Assembly program that implements the RSA (Rivest-Shamir-Adleman) public-key cryptographic algorithm. The document serves as a collaborative blueprint to guide implementation and ensure all team members share a unified understanding before implementation.
+This is a Design Document describes the architecture, module breakdown, function specifications, data flow, and implementation plan for a team-developed ARM Assembly program that implements the RSA (Rivest-Shamir-Adleman) public-key cryptographic algorithm. The document serves as a collaborative blueprint to guide implementation and ensure all team members share a unified understanding before the implementation.
 
 RSA is an asymmetric cryptographic system based on a mathematically related pair of keys: a public key used to encrypt a message, and a private key used to decrypt it. The fundamental principle behind RSA cryptography is based on the mathematical principle that it is relatively trivial to multiply two large prime numbers together to produce a public modulus (n = p*q), but it is impossible for a computer to reverse-engineer the modulus to obtain the two original prime numbers required to generate the private key. This effectively means that anyone in the world can encrypt a message using the public parameters, but only the person it is sent to has access to the exact mathematical parameters required to decrypt it.
 
