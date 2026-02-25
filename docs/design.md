@@ -14,6 +14,8 @@ Team Members:
 - Dana Zhang
 
 ## Overview & Context
+This is a Design Document describes the architecture, module breakdown, function specifications, data flow, and implementation plan for a team-developed ARM Assembly program that implements the RSA (Rivest-Shamir-Adleman) public-key cryptographic algorithm. The document serves as a collaborative blueprint to guide implementation and ensure all team members share a unified understanding before coding begins.
+
 
 ## Scope & Responsibilities
 
