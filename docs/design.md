@@ -57,6 +57,7 @@ TODO: Summarize the project requirements document and explain the general workfl
 
 ### TODO: Add detailed function definitions here (All team members)
 
+
 ## Testing (Savlatjon)
 Testing Strategy 
 The proposed testing plan - we will test our application on three different levels: unit testing for individual functions of the RSA library, orchestration/UI validation for input validation, and finally end-to-end testing for file handling and flow of the algorithm. We have also considered the ARM architecture for our system; thus, we will carry out our validation directly on the Mystic Beast server.
