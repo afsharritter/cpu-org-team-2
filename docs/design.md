@@ -67,6 +67,7 @@ Our phases for testing will be as follows:
 3. End-to-End (Integration) Testing - This involves validating our main program to ensure it can successfully encrypt a message entered by the user, save it appropriately to a file named encrypted.txt, read it back appropriately, decrypt it, and save it to a file named plaintext.txt.
 
 Examples:
+
 Unit tests
 - isPrime(11, 13) -> True.
 - isPrime(9, 1) -> False.
