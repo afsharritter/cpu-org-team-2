@@ -58,15 +58,25 @@ TODO: Summarize the project requirements document and explain the general workfl
 ### TODO: Add detailed function definitions here (All team members)
 
 ## Testing (Savlatjon)
+Testing Strategy 
+The proposed testing plan - we will test our application on three different levels: unit testing for individual functions of the RSA library, orchestration/UI validation for input validation, and finally end-to-end testing for file handling and flow of the algorithm. We have also considered the ARM architecture for our system; thus, we will carry out our validation directly on the Mystic Beast server.
 
-Test Key Generation
-Test1 |	p | q 	Expected Behavior	                         Status
-Test2 | 7 | 11	Both prime, n=77; proceed to e entry.	     PASS
-Test3 | 11| 13	Both prime, n=143; recommended key set.	   PASS
-Test4 |	4 |	11	p=4 not prime; prompt user to re-enter p.	 FAIL
-Test5 |	7 |	9	  q=9 not prime; prompt user to re-enter q.	 FAIL
-Test6 |	1 |	1	  Both rejected (1 is not prime).	           FAIL
+Our phases for testing will be as follows:
+1. Unit Validation - This involves validating individual functions such as isPrime(), gcd(), pow(), etc.
+2. Orchestration/UI Validation - This involves validating our main program to ensure it is prompting the user appropriately, validating input appropriately (e.g., input values for prime numbers must be less than or equal to 50), etc.
+3. End-to-End (Integration) Testing - This involves validating our main program to ensure it can successfully encrypt a message entered by the user, save it appropriately to a file named encrypted.txt, read it back appropriately, decrypt it, and save it to a file named plaintext.txt.
 
+Examples:
+Unit tests
+- isPrime(11, 13) -> True.
+- isPrime(9, 1) -> False.
+- gcd(7, 120) -> 1.
+
+UI/Input tests
+- p or q > 50 -> Prompts user to re-enter the value.
+
+End-to-End tests
+- Encryption	Enter a string "Hello from TEAM x" -> Converts characters to ASCII, encrypts each separately, and writes to "encrypted.txt".
 
 ## Open Questions
 
