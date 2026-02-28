@@ -85,7 +85,7 @@ This program will have the following responsibilities:
 
 ### TODO: Add detailed function definitions here (All team members)
 
-- cprivexp(e, phi): Computes and returns the RSA private exponent `d` such that $d = (1 + x * phi) / e$ (d is the modular inverse of `e mod phi`).
+- `cprivexp(e, phi)`: Computes and returns the RSA private exponent `d` such that $d = (1 + x * phi) / e$ (d is the modular inverse of `e mod phi`).
   - inputs: r0 -> e, r1 -> phi
   - outputs: r0 -> d
 
