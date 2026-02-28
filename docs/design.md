@@ -50,6 +50,38 @@ TODO: Summarize the project requirements document and explain the general workfl
 - Milestone : Collaborate with another group to test our program
 
 ## Proposed Solution & Use Cases (Elizabeth)
+The proposed solution intends to enable a secure and successful message exchange using RSA encryption. As RSA is a public-key encryption, the proposed solution is broken into 3 parts that work in concert provide the unified method for secure message exchange:  (1) generating public and private keys, (2) encryption of a message using a public key, and (3) decryption of a message using a private key.
+
+The program will first prompt user input for the desired use case. All use cases are called from the main program, in which matching a valid input value from the user triggers the call. 
+
+**TODO** Insert eraser diagram image here to show the input validator??? We will need this function anyway to keep the user in a loop until they pick a valid input (i.e., if the user selects use case 4, display the use case selection prompt again until the user picks a 1 2 or 3 instead of exiting)
+
+Valid inputs are positive integers `1`, `2`, and `3` that map to the use case. For example, a user input `3` will trigger the Use Case 3, Decrypt Message call to execute.
+
+### Use Case 1: Generating Public and Private Keys
+The following process diagram outlines input handling, dataflow, and output for the public and private key generation:
+
+![Public and Private Key Generation](./images/generate_keys.png)
+
+A corresponding procedural outline is as follows:
+
+1. The user will first be prompted for two positive prime integers, `p` and `q`. Each number will be validated as prime via the function `isPrime()`, and either proceeds to call `cpubexp()` for public key computation on valid input or **TODO** should the user be prompted again for p and q or exit on invalid input???
+
+2. The user is then prompted for the public key exponent value `e`, which is validated to fit the following criteria in `isValid_e()`in a future call **TODO** `gcd` needs to be in `isValid_e`
+    - `e` is a positive integer
+    - `e` is small, 1 < e  < $\phi$(n) = (p - 1)(q - 1)
+    - `e` is coprime to $\phi$(n). This is determined by validating that the greatest common divisor between `e` and $\phi$ is 1, or `gcd(e, phi) = 1`
+
+3. The first half of the public key, `n`, with `calc_n()` is determined with inputs `p` and `q`.
+4. The Euler totient, referred to as $\phi$(n) with the label `phi` is computed from inputs `p` and `q` in the function call `calc_phi()`
+5. The function `is_Valid_e()` validates input `e` using `phi`. * An invalid input value of `e` will **TODO**
+6. With values for `p`, `q`, and `e`, the program calls `cprivexp()` to compute the private key, `d`:
+    - a. The function call `modinv()` calculates the modular inverse `d` such that $de \equiv 1 \pmod{\phi}$
+7. The user's key components are saved to a file, called `keys.txt`, in a format in which the decryption process is expecting:
+    - first half of public key, `n` on line 1
+    - second half of public key, `e` on line 2
+    - private key, `d` on line 3
+8. The user's public key components, `d` and `e` are presented as stdout to the user for sharing with a trusted sender. 
 
 ## Technical Architecture
 
@@ -89,6 +121,11 @@ Software Design Doc Due: Mar 1
 Try to coordinate w/ another group by April 15
 Final Project Due: May 3
 
+## Sources
+
+Source material used for developing the proposed solution is cited below:
+
+1. [Brilliant: RSA Encryption](https://brilliant.org/wiki/rsa-encryption/)
 ## Team Roles & Responsibilities
 
 - Sandra Banaszak - Encrypt/Decrypt (RSA Lib pow(), mod())
