@@ -9,8 +9,8 @@ fs [icon: folder, color: yellow, label: "File System"]
 
 user > orch: Run RSA.s
 orch > user: Prompt menu
+user > orch: Select 1. Generate Keys
 Keys [label: "1. Generate Keys"] {
-  user > orch: Select 1. Generate Keys
   loop [label: "until isPrime(p) == true"] {
     orch <> user: Prompt p
     orch > rsa: isPrime(p)
@@ -33,20 +33,21 @@ Keys [label: "1. Generate Keys"] {
       orch > user: Display "q is not prime"
     }
   }
+  orch > rsa: calc_n(p, q)
+  orch > rsa: calc_phi(p, q)
   Public Key [label: "Public Key"] {
     loop [label: "until cpubexp(p,q,e) returns status code 0"] {
       orch <> user: Prompt e
-      orch > rsa: call cpubexp(p, q, e)
-      rsa > rsa: calc_n(p, q)
-      rsa > rsa: calc_phi(p, q)
-      rsa > rsa: isValid_e(e)
-      rsa > rsa: gcd(e, phi)
-      alt [label: "is valid e"] {
-        rsa > orch: return 0, n, phi, e
-      } else [label: "is invalid e"] {
-        rsa > orch: return 1
-        orch > user: Display "e is not valid"
-      }
+      orch > rsa: call cpubexp(p, q, e)      
+        alt [label: "e is valid"] {
+          rsa > rsa: isPositive(e)
+          rsa > rsa: isELessThanPhi(e)
+          rsa > rsa: gcd(e, phi)
+          rsa > orch: return 0, e, phi, n
+        } else [label: "e is invalid"] {
+          rsa > orch: return 1
+          orch > user: Display "e is not valid. Please enter a new value for e"
+        }
     }
   }
   Private Key [label: "Private Key"] {
@@ -54,7 +55,6 @@ Keys [label: "1. Generate Keys"] {
     rsa > rsa: modinv(e, phi)
     rsa > orch: return d
   }
-  
   orch > user: Display n, e, d
   orch > fs: Save keys.txt 
 }

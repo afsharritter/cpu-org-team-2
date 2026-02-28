@@ -9,18 +9,16 @@ fs [icon: folder, color: yellow, label: "File System"]
 
 user > orch: Run RSA.s
 orch > user: Prompt menu
-user > orch: Select 3. Decrypt File
+orch > user: Select 3. Decrypt File
 Keys [label: "2. Decrypt File"] {
   user <> orch: Prompt d & n
-  user <> orch: Prompt Filename
-  orch > orch: Extract file text
+  fs > orch: Read encrypted.txt
   loop [label: "for each encrypted character"] {
     orch > orch: Get ASCII Equivalent
-    orch > rsa: decrypt(c, e, n)
-    rsa > rsa: pow(c, e)
+    orch > rsa: decrypt(c, d, n)
+    rsa > rsa: pow(c, d)
     rsa > rsa: mod(n)
     rsa > orch: return m
-
   }
   orch > user: Display m[]
   orch > fs: Save decrypted.txt 
