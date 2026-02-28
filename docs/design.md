@@ -65,7 +65,7 @@ The following process diagram outlines input handling, dataflow, and output for 
 
 A corresponding procedural outline is as follows:
 
-1. The user will first be prompted for two positive prime integers, `p` and `q`. Each number will be validated as prime via the function `isPrime()`, and either proceeds to call `cpubexp()` for public key computation on valid input or **TODO** should the user be prompted again for p and q or exit on invalid input???
+1. The user will first be prompted for two positive prime integers, `p` and `q`. Each number will be validated as prime via the function `isPrime()`, and either proceeds to call `cpubexp()` for public key computation on valid input or prompt the user for input until the input is valid.
 
 2. The user is then prompted for the public key exponent value `e`, which is validated to fit the following criteria in `isValid_e()`in a future call **TODO** `gcd` needs to be in `isValid_e`
     - `e` is a positive integer
@@ -74,7 +74,7 @@ A corresponding procedural outline is as follows:
 
 3. The first half of the public key, `n`, with `calc_n()` is determined with inputs `p` and `q`.
 4. The Euler totient, referred to as $\phi$(n) with the label `phi` is computed from inputs `p` and `q` in the function call `calc_phi()`
-5. The function `is_Valid_e()` validates input `e` using `phi`. * An invalid input value of `e` will **TODO**
+5. The function `is_Valid_e()` validates input `e` using `phi`. * An invalid input value of `e` will prompt the user for input again.
 6. With values for `p`, `q`, and `e`, the program calls `cprivexp()` to compute the private key, `d`:
     - a. The function call `modinv()` calculates the modular inverse `d` such that $de \equiv 1 \pmod{\phi}$
 7. The user's key components are saved to a file, called `keys.txt`, in a format in which the decryption process is expecting:
@@ -85,6 +85,7 @@ A corresponding procedural outline is as follows:
 
 ### Use Case 2: Encrypting a Message
 The following process diagram outlines input handling, dataflow, and output for message encryption.
+**TODO** get ASCII equivalent by doing conversion? a lookup table?
 ![Message Encryption](./images/encrypt_message.png)
 
 ### Use Case 3: Decrypting a Message
@@ -124,10 +125,21 @@ End-to-End tests
 
 ## Timeline (Elizabeth)
 
-Software Design Doc Due: Mar 1
+`Start Date: Feb 16, 2026`
 
-Try to coordinate w/ another group by April 15
-Final Project Due: May 3
+`Milestone 1 - Software Design Doc:  Mar 1, 2026`
+
+`Milestone 2, Components of Use Case 1 - Validate p and q with isPrime(), calc_n(), calc_phi(), gcd(), isValid_e(), modinv(), save to file:  Mar 15, 2026`
+
+`Milestone 3, Components of Use Cases 2 and 3 - prompt for user input, read from file, pow(), mod(), numeric to ascii conversion:  Mar 15, 2026`
+
+`Milestone 4, Modular implementation of Use cases 1/2/3 without looping - prompt for user for use case, proceeed to call use case modules that fail on invalid input: Apr 5, 2026`
+
+`Milestone 5 - Implement looping and codify functional testing: Apr 12, 2026`
+
+`Milestone 6 - Bonus Opportunity for message exchange with another group: April 15, 2026`
+
+`End Date: May 3, 2026`
 
 ## Sources
 
