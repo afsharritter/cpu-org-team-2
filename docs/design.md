@@ -83,6 +83,14 @@ A corresponding procedural outline is as follows:
     - private key, `d` on line 3
 8. The user's public key components, `d` and `e` are presented as stdout to the user for sharing with a trusted sender. 
 
+### Use Case 2: Encrypting a Message
+The following process diagram outlines input handling, dataflow, and output for message encryption.
+![Message Encryption](./images/encrypt_message.png)
+
+### Use Case 3: Decrypting a Message
+The following process diagram outlines input handling, dataflow, and output for message decryption.
+![Message Decryption](./images/decrypt_message.png)
+
 ## Technical Architecture
 
 ### TODO: Add diagrams here (James w/ input from the group)
