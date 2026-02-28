@@ -69,13 +69,12 @@ This program will have the following responsibilities:
 
 ### Milestones (James)
 
-- Milestone : Complete Software Design Doc & Technical Architecture Plan
-- Milestone : User prompting and general program flow completed
-- Milestone : Public & Private Key Generation functionality completed and tested
-- Milestone : Encryption functionality completed and tested
-- Milestone : Decryption functionality completed and tested
-- Milestone : Perform end-to-end program testing
-- Milestone : Collaborate with another group to test our program
+- Milestone 1 - Software Design Doc
+- Milestone 2, Components of Use Case 1 - Validate p and q with isPrime(), calc_n(), calc_phi(), gcd(), isValid_e(), modinv(), save to file
+- Milestone 3, Components of Use Cases 2 and 3 - prompt for user input, read from file, pow(), mod(), numeric to ascii conversion
+- Milestone 4, Modular implementation of Use cases 1/2/3 without looping - prompt for user for use case, proceeed to call use case modules that fail on invalid input
+- Milestone 5 - Implement looping and codify functional testing
+- Milestone 6 - Bonus Opportunity for message exchange with another group
 
 ## Proposed Solution & Use Cases (Elizabeth)
 
