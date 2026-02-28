@@ -32,7 +32,7 @@ Keys [label: "1. Generate Keys"] {
       rsa > orch: return 0   // or false
       orch > user: Display "q is not prime"
     }
-  }
+  }g
   Public Key [label: "Public Key"] {
     loop [label: "until cpubexp(p,q,e) returns status code 0"] {
       orch <> user: Prompt e
