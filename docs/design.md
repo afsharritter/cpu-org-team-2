@@ -99,7 +99,7 @@ Diagrams (James)
     
 - `isPrime(n)`: Check for a prime number and returns `1`(`true`) or `0`(`false`).
   - inputs: r0 -> n
-  - outputs: r0 -> 0(false), 1(true)
+  - outputs: r0 -> `1`(`true`) or `0`(`false`)
     
 - `cprivexp(e, phi)`: Computes and returns the RSA private exponent `d` such that $d = (1 + x * phi) / e$ (d is the modular inverse of `e mod phi`).
   - inputs: r0 -> e, r1 -> phi
