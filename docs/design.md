@@ -38,6 +38,18 @@ RSA is an asymmetric cryptography system used to generate a public and private k
 
 TODO: Summarize the project requirements document and explain the general workflow of the program.
 
+Menu System:
+```
+---- RSA Encryption Program ----
+1. Generate Public and Private Keys
+2. Encrypt a Message
+3. Decrypt a Message
+4. Exit
+
+Enter a choice (1-4):
+```
+
+
 ## Goals & Milestones
 
 ### Goals (James)
@@ -92,6 +104,30 @@ The following process diagram outlines input handling, dataflow, and output for 
 ### Use Case 3: Decrypting a Message
 The following process diagram outlines input handling, dataflow, and output for message decryption.
 ![Message Decryption](./images/decrypt_message.png)
+
+1. The user selects the "Decrypt a Message" option from the main menu.
+2. The program first validates that keys are available by checking memory for valid values of `n` and `d`, either loaded from `keys.txt` or passed in as parameters. If no valid keys are found, the user is prompted to generate keys first and is then returned to the main menu.
+3. The program attempts to open `encrypted.txt` in read mode.
+   -  If the file does not exist or the file descriptor returned is negative, an error message is displayed and the user is returned to the main menu.
+   -  If the file exists but is empty, a separate error message is displayed and the file descriptor is closed cleanly before returning to the main menu.
+4. The full contents of `encrypted.txt` are read into an input buffer. The file is then closed. The buffer is expected to contain space-delimited integer tokens, each one representing one encrypted character value `c`.
+5. The program opens `plaintext.txt` for writing. If the file cannot be created or opened, an error message is displayed, all file descriptors are closed, and the user is returned to the main menu.
+6. The program enters a loop, processing each space-delimited integer token from the input buffer one at a time:
+    - a. For each encrypted token `c`, the program performs validation before decryption. The token must be:
+        - a valid numeric integer value
+        - non-negative
+        - less than `n`
+        - If a token fails validation, the program displayes an error message, stops the decryption process, closes all file descriptors, and returns the user to the main menu.
+    - b. The function `decrypt()` is called with inputs `c`, `d`, and `n`, which internally call `pow_mod(c, d, n)` to compute the plaintext numeric value `m = c^d mod n`.
+    - c. The resulting numeric value `m` is interpreted as an ASCII character and is written to the `plaintext.txt` output buffer.
+7. After all tokens are processed, `plaintext.txt` is closed. 
+8. The decrypted plaintext message is displayed to the user via stdout:
+   ```
+   Decryption message:
+   <plaintext message>
+   ```
+    The user confirms if the decryption was successful. A distorted/garbage output can indicate that the keys used for decryption do not match the keys used for encryption. 
+9. The user is returned to the main menu. 
 
 ## Technical Architecture
 
