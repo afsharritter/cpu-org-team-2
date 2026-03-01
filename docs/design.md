@@ -80,7 +80,7 @@ This program will have the following responsibilities:
 
 ## Technical Architecture
 
-Diagrams
+Diagrams (James)
 
 - Key generation
 <img width="1769" height="4730" alt="generate_keys" src="https://github.com/user-attachments/assets/e97839c2-9359-4135-8047-7e28955707d7" />
