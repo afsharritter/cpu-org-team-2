@@ -54,8 +54,6 @@ The proposed solution intends to enable a secure and successful message exchange
 
 The program will first prompt user input for the desired use case. All use cases are called from the main program, in which matching a valid input value from the user triggers the call. 
 
-**TODO** Insert eraser diagram image here to show the input validator??? We will need this function anyway to keep the user in a loop until they pick a valid input (i.e., if the user selects use case 4, display the use case selection prompt again until the user picks a 1 2 or 3 instead of exiting)
-
 Valid inputs are positive integers `1`, `2`, and `3` that map to the use case. For example, a user input `3` will trigger the Use Case 3, Decrypt Message call to execute.
 
 ### Use Case 1: Generating Public and Private Keys
@@ -67,21 +65,24 @@ A corresponding procedural outline is as follows:
 
 1. The user will first be prompted for two positive prime integers, `p` and `q`. Each number will be validated as prime via the function `isPrime()`, and either proceeds to call `cpubexp()` for public key computation on valid input or prompt the user for input until the input is valid.
 
-2. The user is then prompted for the public key exponent value `e`, which is validated to fit the following criteria in `isValid_e()`in a future call **TODO** `gcd` needs to be in `isValid_e`
+2. The user is then prompted for the public key exponent value `e`, which is validated to fit the following criteria in `isValid_e()`in a future call.
     - `e` is a positive integer
     - `e` is small, 1 < e  < $\phi$(n) = (p - 1)(q - 1)
     - `e` is coprime to $\phi$(n). This is determined by validating that the greatest common divisor between `e` and $\phi$ is 1, or `gcd(e, phi) = 1`
 
 3. The first half of the public key, `n`, with `calc_n()` is determined with inputs `p` and `q`.
 4. The Euler totient, referred to as $\phi$(n) with the label `phi` is computed from inputs `p` and `q` in the function call `calc_phi()`
-5. The function `is_Valid_e()` validates input `e` using `phi`. * An invalid input value of `e` will prompt the user for input again.
-6. With values for `p`, `q`, and `e`, the program calls `cprivexp()` to compute the private key, `d`:
+5. The function `is_Valid_e()` validates input `e` using `phi`. A invalid input value of `e` will prompt the user for input again.
+    - a. this function verifies that `e` is as positive integer
+    - b. this function verifies that 1 < e  < $\phi$(n) = (p - 1)(q - 1)
+    - c. this function calls `gcd()` to verify that the greatest common divisor for `e` and `phi` is 1
+7. With values for `p`, `q`, and `e`, the program calls `cprivexp()` to compute the private key, `d`:
     - a. The function call `modinv()` calculates the modular inverse `d` such that $de \equiv 1 \pmod{\phi}$
-7. The user's key components are saved to a file, called `keys.txt`, in a format in which the decryption process is expecting:
+8. The user's key components are saved to a file on disk, called `keys.txt`, in a format in which the decryption process is expecting:
     - first half of public key, `n` on line 1
     - second half of public key, `e` on line 2
     - private key, `d` on line 3
-8. The user's public key components, `d` and `e` are presented as stdout to the user for sharing with a trusted sender. 
+9. The user's public key components, `n` and `e` are presented as stdout to the user for sharing with a trusted sender. The private key, `d`, is also presented to the user along with `n` and `e`, but is not meant for sharing.
 
 ### Use Case 2: Encrypting a Message
 The following process diagram outlines input handling, dataflow, and output for message encryption.
@@ -98,7 +99,60 @@ The following process diagram outlines input handling, dataflow, and output for 
 
 ### TODO: Add detailed function definitions here (All team members)
 
+$calc_n(p, q)$
+Inputs:
+-  p, a positive integer p < 50
+-  q, a positive integeer q < 50
 
+Outputs: 
+- n, the product of p anq, p*q
+
+$calc_phi(p, q)$
+Inputs:
+-  p, a positive integer p < 50
+-  q, a positive integeer q < 50
+
+Outputs: 
+- phi, the Euler totient, (p - 1) * (q - 1)
+
+
+$gcd(e, phi)$
+Inputs:
+-  e, a positive integer
+-  phi, the Euler totient
+
+Outputs: 
+- m, the greatest common divisor
+
+
+$isValid_e(e, phi)$
+Inputs:
+-  e, a positive integer
+-  phi, the Euler totient, (p - 1) * (q - 1)
+
+Outputs: 
+- 0 if the result from gcd() is not 1, and 1 if the result from gcd() is 1
+
+Calls: 
+- gcd()
+
+
+$cpubexp(p, q, e)$
+Inputs:
+-  p, a positive integer p < 50
+-  q, a positive integeer q < 50
+-  e, a positive integer
+
+Outputs: 
+- n, the product of p anq, p*q or the first half of the public key
+- e, a positive integer or the second half of the public key
+
+Calls:
+- calc_n()
+- calc_phi()
+- isValid_e()
+
+  
 ## Testing (Savlatjon)
 Testing Strategy 
 The proposed testing plan - we will test our application on three different levels: unit testing for individual functions of the RSA library, orchestration/UI validation for input validation, and finally end-to-end testing for file handling and flow of the algorithm. We have also considered the ARM architecture for our system; thus, we will carry out our validation directly on the Mystic Beast server.
