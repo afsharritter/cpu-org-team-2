@@ -76,31 +76,21 @@ This program will have the following responsibilities:
 - Milestone 5 - Implement looping and codify functional testing
 - Milestone 6 - Bonus Opportunity for message exchange with another group
 
-## Proposed Solution & Use Cases (Elizabeth)
-
 ## Technical Architecture
 
-Diagrams (James)
+The RSA.s program will run in a loop that prompts the user to (1) generate public/private keys, (2) encrypt a message, or (3) decrypt a file. Based on the user’s selection (1, 2, or 3), the program will branch to the appropriate use case and then return to the main menu upon completion. The diagram below provides a high-level overview of the program loop, branching logic, and available use cases. See the Proposed Solution & Use Cases section for a more detailed view of each use case.
+![Technical Architecture Diagram (High Level)](./images/program_loop.png)
 
-- Key generation
-<img width="1769" height="4730" alt="generate_keys" src="https://github.com/user-attachments/assets/e97839c2-9359-4135-8047-7e28955707d7" />
-
-- Message enryption
-<img width="1635" height="2263" alt="encrypt_message" src="https://github.com/user-attachments/assets/cdd9fdad-62fb-4f36-b54a-e491484d5984" />
-
-- Message decryption
-<img width="1634" height="2263" alt="decrypt_message" src="https://github.com/user-attachments/assets/ca09b6b4-951d-4841-8d09-565e0789d975" />
-
+## Proposed Solution & Use Cases (Elizabeth)
 
 ### TODO: Add detailed function definitions here (All team members)
+
 - `pow(n, e)`: Computes and returns exponentiation.
   - inputs: r0 -> n, r1 -> e
   - outputs: r0 -> n^e
-    
 - `isPrime(n)`: Check for a prime number and returns `1`(`true`) or `0`(`false`).
   - inputs: r0 -> n
   - outputs: r0 -> `1`(`true`) or `0`(`false`)
-    
 - `cprivexp(e, phi)`: Computes and returns the RSA private exponent `d` such that $d = (1 + x * phi) / e$ (d is the modular inverse of `e mod phi`).
   - inputs: r0 -> e, r1 -> phi
   - outputs: r0 -> d
