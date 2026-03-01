@@ -79,14 +79,10 @@ Enter a choice (1-4):
 - Goal 3: Ensure correctness and readability through incremental testing at each major feature milestone.
 - Goal 4: Validate robustness by testing with another group’s implementation and handling invalid inputs gracefully.
 
-### Milestones (James)
+## Proposed Solution & Use Cases (Elizabeth)
+The proposed solution intends to enable a secure and successful message exchange using RSA encryption. As RSA is a public-key encryption, the proposed solution is broken into 3 parts that work in concert provide the unified method for secure message exchange:  (1) generating public and private keys, (2) encryption of a message using a public key, and (3) decryption of a message using a private key.
 
-- Milestone 1 - Software Design Doc
-- Milestone 2, Components of Use Case 1 - Validate p and q with isPrime(), calc_n(), calc_phi(), gcd(), isValid_e(), modinv(), save to file
-- Milestone 3, Components of Use Cases 2 and 3 - prompt for user input, read from file, pow(), mod(), numeric to ascii conversion
-- Milestone 4, Modular implementation of Use cases 1/2/3 without looping - prompt for user for use case, proceeed to call use case modules that fail on invalid input
-- Milestone 5 - Implement looping and codify functional testing
-- Milestone 6 - Bonus Opportunity for message exchange with another group
+The program will first prompt user input for the desired use case. All use cases are called from the main program, in which matching a valid input value from the user triggers the call. 
 
 ## Proposed Solution & Use Cases (Elizabeth)
 The proposed solution intends to enable a secure and successful message exchange using RSA encryption. As RSA is a public-key encryption, the proposed solution is broken into 3 parts that work in concert provide the unified method for secure message exchange:  (1) generating public and private keys, (2) encryption of a message using a public key, and (3) decryption of a message using a private key.
@@ -166,18 +162,47 @@ The following process diagram outlines input handling, dataflow, and output for 
     The user confirms if the decryption was successful. A distorted/garbage output can indicate that the keys used for decryption do not match the keys used for encryption. 
 9. The user is returned to the main menu. 
 
-## Technical Architecture
+### Use Case 1: Generating Public and Private Keys
+The following process diagram outlines input handling, dataflow, and output for the public and private key generation:
 
-Diagrams (James)
+![Public and Private Key Generation](./images/generate_keys.png)
 
-- Key generation
-<img width="1769" height="4730" alt="generate_keys" src="https://github.com/user-attachments/assets/e97839c2-9359-4135-8047-7e28955707d7" />
+A corresponding procedural outline is as follows:
 
-- Message enryption
-<img width="1635" height="2263" alt="encrypt_message" src="https://github.com/user-attachments/assets/cdd9fdad-62fb-4f36-b54a-e491484d5984" />
+1. The user will first be prompted for two positive prime integers, `p` and `q`. Each number will be validated as prime via the function `isPrime()`, and either proceeds to call `cpubexp()` for public key computation on valid input or prompt the user for input until the input is valid.
 
-- Message decryption
-<img width="1634" height="2263" alt="decrypt_message" src="https://github.com/user-attachments/assets/ca09b6b4-951d-4841-8d09-565e0789d975" />
+2. The user is then prompted for the public key exponent value `e`, which is validated to fit the following criteria in `isValid_e()`in a future call.
+    - `e` is a positive integer
+    - `e` is small, 1 < e  < $\phi$(n) = (p - 1)(q - 1)
+    - `e` is coprime to $\phi$(n). This is determined by validating that the greatest common divisor between `e` and $\phi$ is 1, or `gcd(e, phi) = 1`
+
+3. The first half of the public key, `n`, with `calc_n()` is determined with inputs `p` and `q`.
+4. The Euler totient, referred to as $\phi$(n) with the label `phi` is computed from inputs `p` and `q` in the function call `calc_phi()`
+5. The function `is_Valid_e()` validates input `e` using `phi`. A invalid input value of `e` will prompt the user for input again.
+    - a. this function verifies that `e` is as positive integer
+    - b. this function verifies that 1 < e  < $\phi$(n) = (p - 1)(q - 1)
+    - c. this function calls `gcd()` to verify that the greatest common divisor for `e` and `phi` is 1
+7. With values for `p`, `q`, and `e`, the program calls `cprivexp()` to compute the private key, `d`:
+    - a. The function call `modinv()` calculates the modular inverse `d` such that $de \equiv 1 \pmod{\phi}$
+8. The user's key components are saved to a file on disk, called `keys.txt`, in a format in which the decryption process is expecting:
+    - first half of public key, `n` on line 1
+    - second half of public key, `e` on line 2
+    - private key, `d` on line 3
+9. The user's public key components, `n` and `e` are presented as stdout to the user for sharing with a trusted sender. The private key, `d`, is also presented to the user along with `n` and `e`, but is not meant for sharing.
+
+### Use Case 2: Encrypting a Message (Kangjie Mi)
+The following process diagram outlines input handling, dataflow, and output for message encryption.
+**TODO** get ASCII equivalent by doing conversion? a lookup table?
+![Message Encryption](./images/encrypt_message.png)
+
+1. The user will first be prompted for decrypted plaintext character of message.
+
+2. Then program will prompt for integer `e` and `n` as public key factors used for encryption process. `n` was calucalted from public key generation function calc_n() and e was user input in private key generation step that passed validation 
+
+3. The Equation c = m^e mod n is generate cipher text c from given m (plaintext character), e (public key exponent) and n (modulus). The program then loop each individual character of plaintext input, applying the equation to find each encypted characters and hence full excrypted text.
+
+4. Lastly the program writed encrypted message to file named "encrypted.txt" 
+
 
 
 $calc_n(p, q)$
