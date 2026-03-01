@@ -58,6 +58,18 @@ This program will have the following responsibilities:
    b. Decrypt each character in sequence using the `decrypt` function.
    c. Save the decrypted message in a file called `decrypted.txt`.
 
+Menu System:
+```
+---- RSA Encryption Program ----
+1. Generate Public and Private Keys
+2. Encrypt a Message
+3. Decrypt a Message
+4. Exit
+
+Enter a choice (1-4):
+```
+
+
 ## Goals & Milestones
 
 ### Goals (James)
@@ -66,6 +78,11 @@ This program will have the following responsibilities:
 - Goal 2: Maintain a clean separation of concerns between the main program (user interaction, program flow, filesystem) and the RSALib.s library (encryption/decryption math routines).
 - Goal 3: Ensure correctness and readability through incremental testing at each major feature milestone.
 - Goal 4: Validate robustness by testing with another group’s implementation and handling invalid inputs gracefully.
+
+## Proposed Solution & Use Cases (Elizabeth)
+The proposed solution intends to enable a secure and successful message exchange using RSA encryption. As RSA is a public-key encryption, the proposed solution is broken into 3 parts that work in concert provide the unified method for secure message exchange:  (1) generating public and private keys, (2) encryption of a message using a public key, and (3) decryption of a message using a private key.
+
+The program will first prompt user input for the desired use case. All use cases are called from the main program, in which matching a valid input value from the user triggers the call. 
 
 ## Proposed Solution & Use Cases (Elizabeth)
 The proposed solution intends to enable a secure and successful message exchange using RSA encryption. As RSA is a public-key encryption, the proposed solution is broken into 3 parts that work in concert provide the unified method for secure message exchange:  (1) generating public and private keys, (2) encryption of a message using a public key, and (3) decryption of a message using a private key.
@@ -121,14 +138,72 @@ The following process diagram outlines input handling, dataflow, and output for 
 The following process diagram outlines input handling, dataflow, and output for message decryption.
 ![Message Decryption](./images/decrypt_message.png)
 
-## Technical Architecture
+1. The user selects the "Decrypt a Message" option from the main menu.
+2. The program first validates that keys are available by checking memory for valid values of `n` and `d`, either loaded from `keys.txt` or passed in as parameters. If no valid keys are found, the user is prompted to generate keys first and is then returned to the main menu.
+3. The program attempts to open `encrypted.txt` in read mode.
+   -  If the file does not exist or the file descriptor returned is negative, an error message is displayed and the user is returned to the main menu.
+   -  If the file exists but is empty, a separate error message is displayed and the file descriptor is closed cleanly before returning to the main menu.
+4. The full contents of `encrypted.txt` are read into an input buffer. The file is then closed. The buffer is expected to contain space-delimited integer tokens, each one representing one encrypted character value `c`.
+5. The program opens `plaintext.txt` for writing. If the file cannot be created or opened, an error message is displayed, all file descriptors are closed, and the user is returned to the main menu.
+6. The program enters a loop, processing each space-delimited integer token from the input buffer one at a time:
+    - a. For each encrypted token `c`, the program performs validation before decryption. The token must be:
+        - a valid numeric integer value
+        - non-negative
+        - less than `n`
+        - If a token fails validation, the program displayes an error message, stops the decryption process, closes all file descriptors, and returns the user to the main menu.
+    - b. The function `decrypt()` is called with inputs `c`, `d`, and `n`, which internally call `pow_mod(c, d, n)` to compute the plaintext numeric value `m = c^d mod n`.
+    - c. The resulting numeric value `m` is interpreted as an ASCII character and is written to the `plaintext.txt` output buffer.
+7. After all tokens are processed, `plaintext.txt` is closed. 
+8. The decrypted plaintext message is displayed to the user via stdout:
+   ```
+   Decryption message:
+   <plaintext message>
+   ```
+    The user confirms if the decryption was successful. A distorted/garbage output can indicate that the keys used for decryption do not match the keys used for encryption. 
+9. The user is returned to the main menu. 
 
-The RSA.s program will run in a loop that prompts the user to (1) generate public/private keys, (2) encrypt a message, or (3) decrypt a file. Based on the user’s selection (1, 2, or 3), the program will branch to the appropriate use case and then return to the main menu upon completion. The diagram below provides a high-level overview of the program loop, branching logic, and available use cases. See the Proposed Solution & Use Cases section for a more detailed view of each use case.
-![Technical Architecture Diagram (High Level)](./images/program_loop.png)
+### Use Case 1: Generating Public and Private Keys
+The following process diagram outlines input handling, dataflow, and output for the public and private key generation:
 
-## Proposed Solution & Use Cases (Elizabeth)
+![Public and Private Key Generation](./images/generate_keys.png)
 
-### TODO: Add detailed function definitions here (All team members)
+A corresponding procedural outline is as follows:
+
+1. The user will first be prompted for two positive prime integers, `p` and `q`. Each number will be validated as prime via the function `isPrime()`, and either proceeds to call `cpubexp()` for public key computation on valid input or prompt the user for input until the input is valid.
+
+2. The user is then prompted for the public key exponent value `e`, which is validated to fit the following criteria in `isValid_e()`in a future call.
+    - `e` is a positive integer
+    - `e` is small, 1 < e  < $\phi$(n) = (p - 1)(q - 1)
+    - `e` is coprime to $\phi$(n). This is determined by validating that the greatest common divisor between `e` and $\phi$ is 1, or `gcd(e, phi) = 1`
+
+3. The first half of the public key, `n`, with `calc_n()` is determined with inputs `p` and `q`.
+4. The Euler totient, referred to as $\phi$(n) with the label `phi` is computed from inputs `p` and `q` in the function call `calc_phi()`
+5. The function `is_Valid_e()` validates input `e` using `phi`. A invalid input value of `e` will prompt the user for input again.
+    - a. this function verifies that `e` is as positive integer
+    - b. this function verifies that 1 < e  < $\phi$(n) = (p - 1)(q - 1)
+    - c. this function calls `gcd()` to verify that the greatest common divisor for `e` and `phi` is 1
+7. With values for `p`, `q`, and `e`, the program calls `cprivexp()` to compute the private key, `d`:
+    - a. The function call `modinv()` calculates the modular inverse `d` such that $de \equiv 1 \pmod{\phi}$
+8. The user's key components are saved to a file on disk, called `keys.txt`, in a format in which the decryption process is expecting:
+    - first half of public key, `n` on line 1
+    - second half of public key, `e` on line 2
+    - private key, `d` on line 3
+9. The user's public key components, `n` and `e` are presented as stdout to the user for sharing with a trusted sender. The private key, `d`, is also presented to the user along with `n` and `e`, but is not meant for sharing.
+
+### Use Case 2: Encrypting a Message (Kangjie Mi)
+The following process diagram outlines input handling, dataflow, and output for message encryption.
+**TODO** get ASCII equivalent by doing conversion? a lookup table?
+![Message Encryption](./images/encrypt_message.png)
+
+1. The user will first be prompted for decrypted plaintext character of message.
+
+2. Then program will prompt for integer `e` and `n` as public key factors used for encryption process. `n` was calucalted from public key generation function calc_n() and e was user input in private key generation step that passed validation 
+
+3. The Equation c = m^e mod n is generate cipher text c from given m (plaintext character), e (public key exponent) and n (modulus). The program then loop each individual character of plaintext input, applying the equation to find each encypted characters and hence full excrypted text.
+
+4. Lastly the program writed encrypted message to file named "encrypted.txt" 
+
+
 
 $calc_n(p, q)$
 Inputs:
@@ -182,6 +257,32 @@ Calls:
 - calc_n()
 - calc_phi()
 - isValid_e()
+
+$decrypt(c, d, n)$
+Inputs:
+-  c, the cipher text or encrypted character
+-  d, the private sender key
+- n, a portion of the public sender key
+
+Outputs: 
+- m, the decrypted character
+
+Calls: 
+- pow()
+- mod()
+
+$encrypt(m, e, n)$
+Inputs:
+-  m, the character to encrypt
+-  e, a portion of the public sender key
+- n, a portion of the public sender key
+
+Outputs: 
+- c, the encrypted character or ciphertext
+
+Calls: 
+- pow()
+- mod()
 
   
 ## Testing (Savlatjon)
