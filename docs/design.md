@@ -80,9 +80,17 @@ This program will have the following responsibilities:
 
 ## Technical Architecture
 
-### TODO: Add diagrams here (James w/ input from the group)
+Diagrams
 
+- Key generation
 <img width="1769" height="4730" alt="generate_keys" src="https://github.com/user-attachments/assets/e97839c2-9359-4135-8047-7e28955707d7" />
+
+- Message enryption
+<img width="1635" height="2263" alt="encrypt_message" src="https://github.com/user-attachments/assets/cdd9fdad-62fb-4f36-b54a-e491484d5984" />
+
+- Message decryption
+<img width="1634" height="2263" alt="decrypt_message" src="https://github.com/user-attachments/assets/ca09b6b4-951d-4841-8d09-565e0789d975" />
+
 
 ### TODO: Add detailed function definitions here (All team members)
 - `pow(n, e)`: Computes and returns exponentiation.
