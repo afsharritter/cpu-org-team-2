@@ -83,7 +83,11 @@ This program will have the following responsibilities:
 ### TODO: Add diagrams here (James w/ input from the group)
 
 ### TODO: Add detailed function definitions here (All team members)
-- `isPrime(n)`: Computes and returns 1(true) or 0(false).
+- `pow(n, e)`: Computes and returns exponentiation.
+  - inputs: r0 -> n, r1 -> e
+  - outputs: r0 -> n^e
+    
+- `isPrime(n)`: Check for a prime number and returns 1(true) or 0(false).
   - inputs: r0 -> n
   - outputs: r0 -> 0(false), 1(true)
     
