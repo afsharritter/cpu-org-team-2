@@ -123,10 +123,20 @@ A corresponding procedural outline is as follows:
     - private key, `d` on line 3
 9. The user's public key components, `n` and `e` are presented as stdout to the user for sharing with a trusted sender. The private key, `d`, is also presented to the user along with `n` and `e`, but is not meant for sharing.
 
-### Use Case 2: Encrypting a Message
+### Use Case 2: Encrypting a Message (Kangjie Mi)
 The following process diagram outlines input handling, dataflow, and output for message encryption.
 **TODO** get ASCII equivalent by doing conversion? a lookup table?
 ![Message Encryption](./images/encrypt_message.png)
+
+1. The user will first be prompted for decrypted plaintext character of message.
+
+2. Then program will prompt for integer `e` and `n` as public key factors used for encryption process. `n` was calucalted from public key generation function calc_n() and e was user input in private key generation step that passed validation 
+
+3. The Equation c = m^e mod n is generate cipher text c from given m (plaintext character), e (public key exponent) and n (modulus). The program then loop each individual character of plaintext input, applying the equation to find each encypted characters and hence full excrypted text.
+
+4. Lastly the program writed encrypted message to file named "encrypted.txt" 
+
+
 
 ### Use Case 3: Decrypting a Message
 The following process diagram outlines input handling, dataflow, and output for message decryption.
