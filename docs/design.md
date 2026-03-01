@@ -143,9 +143,9 @@ Final Project Due: May 3
 
 ## Team Roles & Responsibilities
 
-- Sandra Banaszak - Encrypt/Decrypt (RSA Lib pow(), mod())
+- Sandra Banaszak - Encrypt/Decrypt
 - Elizabeth Fuller - Generate Public (RSA Lib gcd(), calc_n(), calc_phi(), cpubexp())
-- Savlatjon Khuseynov - Testing (RSA Lib isPrime())
+- Savlatjon Khuseynov - Testing (RSA Lib isPrime(), pow(), mod())
 - James Ritter - Generate Private Keys (RSA Lib cprivexp(), modinv()), I/O
 - Kangjie Mi - CLI/program branching logic
-- Dana Zhang - Unit tests
+- Dana Zhang - Encrypt/Decrypt
