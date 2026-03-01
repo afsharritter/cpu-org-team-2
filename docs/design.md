@@ -97,7 +97,7 @@ Diagrams (James)
   - inputs: r0 -> n, r1 -> e
   - outputs: r0 -> n^e
     
-- `isPrime(n)`: Check for a prime number and returns 1('true') or 0('false').
+- `isPrime(n)`: Check for a prime number and returns `1`(`true`) or `0`(`false`).
   - inputs: r0 -> n
   - outputs: r0 -> 0(false), 1(true)
     
