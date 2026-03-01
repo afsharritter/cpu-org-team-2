@@ -82,6 +82,8 @@ This program will have the following responsibilities:
 
 ### TODO: Add diagrams here (James w/ input from the group)
 
+<img width="1769" height="4730" alt="generate_keys" src="https://github.com/user-attachments/assets/e97839c2-9359-4135-8047-7e28955707d7" />
+
 ### TODO: Add detailed function definitions here (All team members)
 - `pow(n, e)`: Computes and returns exponentiation.
   - inputs: r0 -> n, r1 -> e
