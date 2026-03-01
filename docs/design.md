@@ -67,14 +67,59 @@ This program will have the following responsibilities:
 - Goal 3: Ensure correctness and readability through incremental testing at each major feature milestone.
 - Goal 4: Validate robustness by testing with another group’s implementation and handling invalid inputs gracefully.
 
-### Milestones (James)
+## Proposed Solution & Use Cases (Elizabeth)
+The proposed solution intends to enable a secure and successful message exchange using RSA encryption. As RSA is a public-key encryption, the proposed solution is broken into 3 parts that work in concert provide the unified method for secure message exchange:  (1) generating public and private keys, (2) encryption of a message using a public key, and (3) decryption of a message using a private key.
 
-- Milestone 1 - Software Design Doc
-- Milestone 2, Components of Use Case 1 - Validate p and q with isPrime(), calc_n(), calc_phi(), gcd(), isValid_e(), modinv(), save to file
-- Milestone 3, Components of Use Cases 2 and 3 - prompt for user input, read from file, pow(), mod(), numeric to ascii conversion
-- Milestone 4, Modular implementation of Use cases 1/2/3 without looping - prompt for user for use case, proceeed to call use case modules that fail on invalid input
-- Milestone 5 - Implement looping and codify functional testing
-- Milestone 6 - Bonus Opportunity for message exchange with another group
+The program will first prompt user input for the desired use case. All use cases are called from the main program, in which matching a valid input value from the user triggers the call. 
+
+Valid inputs are positive integers `1`, `2`, and `3` that map to the use case. For example, a user input `3` will trigger the Use Case 3, Decrypt Message call to execute.
+
+### Use Case 1: Generating Public and Private Keys
+The following process diagram outlines input handling, dataflow, and output for the public and private key generation:
+
+![Public and Private Key Generation](./images/generate_keys.png)
+
+A corresponding procedural outline is as follows:
+
+1. The user will first be prompted for two positive prime integers, `p` and `q`. Each number will be validated as prime via the function `isPrime()`, and either proceeds to call `cpubexp()` for public key computation on valid input or prompt the user for input until the input is valid.
+
+2. The user is then prompted for the public key exponent value `e`, which is validated to fit the following criteria in `isValid_e()`in a future call.
+    - `e` is a positive integer
+    - `e` is small, 1 < e  < $\phi$(n) = (p - 1)(q - 1)
+    - `e` is coprime to $\phi$(n). This is determined by validating that the greatest common divisor between `e` and $\phi$ is 1, or `gcd(e, phi) = 1`
+
+3. The first half of the public key, `n`, with `calc_n()` is determined with inputs `p` and `q`.
+4. The Euler totient, referred to as $\phi$(n) with the label `phi` is computed from inputs `p` and `q` in the function call `calc_phi()`
+5. The function `is_Valid_e()` validates input `e` using `phi`. A invalid input value of `e` will prompt the user for input again.
+    - a. this function verifies that `e` is as positive integer
+    - b. this function verifies that 1 < e  < $\phi$(n) = (p - 1)(q - 1)
+    - c. this function calls `gcd()` to verify that the greatest common divisor for `e` and `phi` is 1
+7. With values for `p`, `q`, and `e`, the program calls `cprivexp()` to compute the private key, `d`:
+    - a. The function call `modinv()` calculates the modular inverse `d` such that $de \equiv 1 \pmod{\phi}$
+8. The user's key components are saved to a file on disk, called `keys.txt`, in a format in which the decryption process is expecting:
+    - first half of public key, `n` on line 1
+    - second half of public key, `e` on line 2
+    - private key, `d` on line 3
+9. The user's public key components, `n` and `e` are presented as stdout to the user for sharing with a trusted sender. The private key, `d`, is also presented to the user along with `n` and `e`, but is not meant for sharing.
+
+### Use Case 2: Encrypting a Message (Kangjie Mi)
+The following process diagram outlines input handling, dataflow, and output for message encryption.
+**TODO** get ASCII equivalent by doing conversion? a lookup table?
+![Message Encryption](./images/encrypt_message.png)
+
+1. The user will first be prompted for decrypted plaintext character of message.
+
+2. Then program will prompt for integer `e` and `n` as public key factors used for encryption process. `n` was calucalted from public key generation function calc_n() and e was user input in private key generation step that passed validation 
+
+3. The Equation c = m^e mod n is generate cipher text c from given m (plaintext character), e (public key exponent) and n (modulus). The program then loop each individual character of plaintext input, applying the equation to find each encypted characters and hence full excrypted text.
+
+4. Lastly the program writed encrypted message to file named "encrypted.txt" 
+
+
+
+### Use Case 3: Decrypting a Message
+The following process diagram outlines input handling, dataflow, and output for message decryption.
+![Message Decryption](./images/decrypt_message.png)
 
 ## Technical Architecture
 
@@ -85,16 +130,60 @@ The RSA.s program will run in a loop that prompts the user to (1) generate publi
 
 ### TODO: Add detailed function definitions here (All team members)
 
-- `pow(n, e)`: Computes and returns exponentiation.
-  - inputs: r0 -> n, r1 -> e
-  - outputs: r0 -> n^e
-- `isPrime(n)`: Check for a prime number and returns `1`(`true`) or `0`(`false`).
-  - inputs: r0 -> n
-  - outputs: r0 -> `1`(`true`) or `0`(`false`)
-- `cprivexp(e, phi)`: Computes and returns the RSA private exponent `d` such that $d = (1 + x * phi) / e$ (d is the modular inverse of `e mod phi`).
-  - inputs: r0 -> e, r1 -> phi
-  - outputs: r0 -> d
+$calc_n(p, q)$
+Inputs:
+-  p, a positive integer p < 50
+-  q, a positive integeer q < 50
 
+Outputs: 
+- n, the product of p anq, p*q
+
+$calc_phi(p, q)$
+Inputs:
+-  p, a positive integer p < 50
+-  q, a positive integeer q < 50
+
+Outputs: 
+- phi, the Euler totient, (p - 1) * (q - 1)
+
+
+$gcd(e, phi)$
+Inputs:
+-  e, a positive integer
+-  phi, the Euler totient
+
+Outputs: 
+- m, the greatest common divisor
+
+
+$isValid_e(e, phi)$
+Inputs:
+-  e, a positive integer
+-  phi, the Euler totient, (p - 1) * (q - 1)
+
+Outputs: 
+- 0 if the result from gcd() is not 1, and 1 if the result from gcd() is 1
+
+Calls: 
+- gcd()
+
+
+$cpubexp(p, q, e)$
+Inputs:
+-  p, a positive integer p < 50
+-  q, a positive integeer q < 50
+-  e, a positive integer
+
+Outputs: 
+- n, the product of p anq, p*q or the first half of the public key
+- e, a positive integer or the second half of the public key
+
+Calls:
+- calc_n()
+- calc_phi()
+- isValid_e()
+
+  
 ## Testing (Savlatjon)
 
 Testing Strategy
@@ -126,11 +215,27 @@ End-to-End tests
 
 ## Timeline (Elizabeth)
 
-Software Design Doc Due: Mar 1
+`Start Date: Feb 16, 2026`
 
-Try to coordinate w/ another group by April 15
-Final Project Due: May 3
+`Milestone 1 - Software Design Doc:  Mar 1, 2026`
 
+`Milestone 2, Components of Use Case 1 - Validate p and q with isPrime(), calc_n(), calc_phi(), gcd(), isValid_e(), modinv(), save to file:  Mar 15, 2026`
+
+`Milestone 3, Components of Use Cases 2 and 3 - prompt for user input, read from file, pow(), mod(), numeric to ascii conversion:  Mar 15, 2026`
+
+`Milestone 4, Modular implementation of Use cases 1/2/3 without looping - prompt for user for use case, proceeed to call use case modules that fail on invalid input: Apr 5, 2026`
+
+`Milestone 5 - Implement looping and codify functional testing: Apr 12, 2026`
+
+`Milestone 6 - Bonus Opportunity for message exchange with another group: April 15, 2026`
+
+`End Date: May 3, 2026`
+
+## Sources
+
+Source material used for developing the proposed solution is cited below:
+
+1. [Brilliant: RSA Encryption](https://brilliant.org/wiki/rsa-encryption/)
 ## Team Roles & Responsibilities
 
 - Sandra Banaszak - Encrypt/Decrypt
