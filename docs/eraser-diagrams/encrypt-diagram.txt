@@ -1,4 +1,4 @@
-title Encrypt Message
+title Decrypt File
 autoNumber off
 
 
@@ -9,20 +9,19 @@ fs [icon: folder, color: yellow, label: "File System"]
 
 user > orch: Run RSA.s
 orch > user: Prompt menu
-user > orch: Select 2. Encrypt Message
-Keys [label: "2. Encrypt message"] {
-  user <> orch: Prompt e & n
-  user <> orch: Prompt Message
-  loop [label: "for each character"] {
+orch > user: Select 3. Decrypt File
+Keys [label: "2. Decrypt File"] {
+  user <> orch: Prompt d & n
+  fs > orch: Read encrypted.txt
+  loop [label: "for each encrypted character"] {
     orch > orch: Get ASCII Equivalent
-    orch > rsa: encrypt(m, e, n)
-    rsa > rsa: pow(m, e)
+    orch > rsa: decrypt(c, d, n)
+    rsa > rsa: pow(c, d)
     rsa > rsa: mod(n)
-    rsa > orch: return c
-
+    rsa > orch: return m
   }
-  orch > user: Display c[]
-  orch > fs: Save encrypted.txt 
+  orch > user: Display m[]
+  orch > fs: Save decrypted.txt 
 }
 
 
