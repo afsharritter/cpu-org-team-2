@@ -233,6 +233,32 @@ Calls:
 - calc_phi()
 - isValid_e()
 
+$decrypt(c, d, n)$
+Inputs:
+-  c, the cipher text or encrypted character
+-  d, the private sender key
+- n, a portion of the public sender key
+
+Outputs: 
+- m, the decrypted character
+
+Calls: 
+- pow()
+- mod()
+
+$encrypt(m, e, n)$
+Inputs:
+-  m, the character to encrypt
+-  e, a portion of the public sender key
+- n, a portion of the public sender key
+
+Outputs: 
+- c, the encrypted character or ciphertext
+
+Calls: 
+- pow()
+- mod()
+
   
 ## Testing (Savlatjon)
 
