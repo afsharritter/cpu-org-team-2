@@ -83,7 +83,10 @@ This program will have the following responsibilities:
 ### TODO: Add diagrams here (James w/ input from the group)
 
 ### TODO: Add detailed function definitions here (All team members)
-
+- `isPrime(n)`: Computes and returns 1(true) or 0(false).
+  - inputs: r0 -> n
+  - outputs: r0 -> 0(false), 1(true)
+    
 - `cprivexp(e, phi)`: Computes and returns the RSA private exponent `d` such that $d = (1 + x * phi) / e$ (d is the modular inverse of `e mod phi`).
   - inputs: r0 -> e, r1 -> phi
   - outputs: r0 -> d
