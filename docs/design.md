@@ -151,11 +151,10 @@ The following process diagram outlines input handling, dataflow, and output for 
 The RSA.s program will run in a loop that prompts the user to (1) generate public/private keys, (2) encrypt a message, or (3) decrypt a file. Based on the user’s selection (1, 2, or 3), the program will branch to the appropriate use case and then return to the main menu upon completion. The diagram below provides a high-level overview of the program loop, branching logic, and available use cases. See the Proposed Solution & Use Cases section for a more detailed view of each use case.
 ![Technical Architecture Diagram (High Level)](./images/program_loop.png)
 
-## Proposed Solution & Use Cases (Elizabeth)
+### Detailed Function Descriptions
 
-### TODO: Add detailed function definitions here (All team members)
+`calc_n(p, q)`
 
-$calc_n(p, q)$
 Inputs:
 -  p, a positive integer p < 50
 -  q, a positive integeer q < 50
@@ -163,7 +162,8 @@ Inputs:
 Outputs: 
 - n, the product of p anq, p*q
 
-$calc_phi(p, q)$
+`calc_phi(p, q)`
+
 Inputs:
 -  p, a positive integer p < 50
 -  q, a positive integeer q < 50
@@ -172,7 +172,8 @@ Outputs:
 - phi, the Euler totient, (p - 1) * (q - 1)
 
 
-$gcd(e, phi)$
+`gcd(e, phi)`
+
 Inputs:
 -  e, a positive integer
 -  phi, the Euler totient
@@ -181,7 +182,8 @@ Outputs:
 - m, the greatest common divisor
 
 
-$isValid_e(e, phi)$
+`isValid_e(e, phi)`
+
 Inputs:
 -  e, a positive integer
 -  phi, the Euler totient, (p - 1) * (q - 1)
@@ -192,8 +194,8 @@ Outputs:
 Calls: 
 - gcd()
 
+`cpubexp(p, q, e)`
 
-$cpubexp(p, q, e)$
 Inputs:
 -  p, a positive integer p < 50
 -  q, a positive integeer q < 50
@@ -207,8 +209,10 @@ Calls:
 - calc_n()
 - calc_phi()
 - isValid_e()
-- 
-$decrypt(c, d, n)$
+
+
+`decrypt(c, d, n)`
+
 Inputs:
 -  c, the cipher text or encrypted character
 -  d, the private sender key
@@ -221,7 +225,8 @@ Calls:
 - pow()
 - mod()
 
-$encrypt(m, e, n)$
+`encrypt(m, e, n)`
+
 Inputs:
 -  m, the character to encrypt
 -  e, a portion of the public sender key
@@ -233,7 +238,6 @@ Outputs:
 Calls: 
 - pow()
 - mod()
-
 
   
 ## Testing (Savlatjon)
