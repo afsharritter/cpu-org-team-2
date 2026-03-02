@@ -1,8 +1,9 @@
 # Course Project: ARM Programming RSA Algorithm - Design Document
 
-Course: EN.605.204.81.SP26
-Date Created: 2026-02-06
-Last Update: 2026-02-06
+**Team 2**
+**Course**: EN.605.204.81.SP26
+**Date Created**: 2026-02-06
+**Last Update**: 2026-03-01
 
 Team Members:
 
