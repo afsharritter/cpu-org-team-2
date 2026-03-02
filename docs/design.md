@@ -84,11 +84,6 @@ The proposed solution intends to enable a secure and successful message exchange
 
 The program will first prompt user input for the desired use case. All use cases are called from the main program, in which matching a valid input value from the user triggers the call. 
 
-## Proposed Solution & Use Cases (Elizabeth)
-The proposed solution intends to enable a secure and successful message exchange using RSA encryption. As RSA is a public-key encryption, the proposed solution is broken into 3 parts that work in concert provide the unified method for secure message exchange:  (1) generating public and private keys, (2) encryption of a message using a public key, and (3) decryption of a message using a private key.
-
-The program will first prompt user input for the desired use case. All use cases are called from the main program, in which matching a valid input value from the user triggers the call. 
-
 Valid inputs are positive integers `1`, `2`, and `3` that map to the use case. For example, a user input `3` will trigger the Use Case 3, Decrypt Message call to execute.
 
 ### Use Case 1: Generating Public and Private Keys
@@ -162,50 +157,12 @@ The following process diagram outlines input handling, dataflow, and output for 
     The user confirms if the decryption was successful. A distorted/garbage output can indicate that the keys used for decryption do not match the keys used for encryption. 
 9. The user is returned to the main menu. 
 
-### Use Case 1: Generating Public and Private Keys
-The following process diagram outlines input handling, dataflow, and output for the public and private key generation:
+## Technical Architecure
 
-![Public and Private Key Generation](./images/generate_keys.png)
+### Detailed Function Descriptions
 
-A corresponding procedural outline is as follows:
+`calc_n(p, q)`
 
-1. The user will first be prompted for two positive prime integers, `p` and `q`. Each number will be validated as prime via the function `isPrime()`, and either proceeds to call `cpubexp()` for public key computation on valid input or prompt the user for input until the input is valid.
-
-2. The user is then prompted for the public key exponent value `e`, which is validated to fit the following criteria in `isValid_e()`in a future call.
-    - `e` is a positive integer
-    - `e` is small, 1 < e  < $\phi$(n) = (p - 1)(q - 1)
-    - `e` is coprime to $\phi$(n). This is determined by validating that the greatest common divisor between `e` and $\phi$ is 1, or `gcd(e, phi) = 1`
-
-3. The first half of the public key, `n`, with `calc_n()` is determined with inputs `p` and `q`.
-4. The Euler totient, referred to as $\phi$(n) with the label `phi` is computed from inputs `p` and `q` in the function call `calc_phi()`
-5. The function `is_Valid_e()` validates input `e` using `phi`. A invalid input value of `e` will prompt the user for input again.
-    - a. this function verifies that `e` is as positive integer
-    - b. this function verifies that 1 < e  < $\phi$(n) = (p - 1)(q - 1)
-    - c. this function calls `gcd()` to verify that the greatest common divisor for `e` and `phi` is 1
-7. With values for `p`, `q`, and `e`, the program calls `cprivexp()` to compute the private key, `d`:
-    - a. The function call `modinv()` calculates the modular inverse `d` such that $de \equiv 1 \pmod{\phi}$
-8. The user's key components are saved to a file on disk, called `keys.txt`, in a format in which the decryption process is expecting:
-    - first half of public key, `n` on line 1
-    - second half of public key, `e` on line 2
-    - private key, `d` on line 3
-9. The user's public key components, `n` and `e` are presented as stdout to the user for sharing with a trusted sender. The private key, `d`, is also presented to the user along with `n` and `e`, but is not meant for sharing.
-
-### Use Case 2: Encrypting a Message (Kangjie Mi)
-The following process diagram outlines input handling, dataflow, and output for message encryption.
-**TODO** get ASCII equivalent by doing conversion? a lookup table?
-![Message Encryption](./images/encrypt_message.png)
-
-1. The user will first be prompted for decrypted plaintext character of message.
-
-2. Then program will prompt for integer `e` and `n` as public key factors used for encryption process. `n` was calucalted from public key generation function calc_n() and e was user input in private key generation step that passed validation 
-
-3. The Equation c = m^e mod n is generate cipher text c from given m (plaintext character), e (public key exponent) and n (modulus). The program then loop each individual character of plaintext input, applying the equation to find each encypted characters and hence full excrypted text.
-
-4. Lastly the program writed encrypted message to file named "encrypted.txt" 
-
-
-
-$calc_n(p, q)$
 Inputs:
 -  p, a positive integer p < 50
 -  q, a positive integeer q < 50
@@ -213,7 +170,8 @@ Inputs:
 Outputs: 
 - n, the product of p anq, p*q
 
-$calc_phi(p, q)$
+`calc_phi(p, q)`
+
 Inputs:
 -  p, a positive integer p < 50
 -  q, a positive integeer q < 50
@@ -222,7 +180,8 @@ Outputs:
 - phi, the Euler totient, (p - 1) * (q - 1)
 
 
-$gcd(e, phi)$
+`gcd(e, phi)`
+
 Inputs:
 -  e, a positive integer
 -  phi, the Euler totient
@@ -231,7 +190,8 @@ Outputs:
 - m, the greatest common divisor
 
 
-$isValid_e(e, phi)$
+`isValid_e(e, phi)`
+
 Inputs:
 -  e, a positive integer
 -  phi, the Euler totient, (p - 1) * (q - 1)
@@ -243,7 +203,8 @@ Calls:
 - gcd()
 
 
-$cpubexp(p, q, e)$
+`cpubexp(p, q, e)`
+
 Inputs:
 -  p, a positive integer p < 50
 -  q, a positive integeer q < 50
@@ -258,7 +219,8 @@ Calls:
 - calc_phi()
 - isValid_e()
 
-$decrypt(c, d, n)$
+`decrypt(c, d, n)`
+
 Inputs:
 -  c, the cipher text or encrypted character
 -  d, the private sender key
@@ -271,7 +233,8 @@ Calls:
 - pow()
 - mod()
 
-$encrypt(m, e, n)$
+`encrypt(m, e, n)`
+
 Inputs:
 -  m, the character to encrypt
 -  e, a portion of the public sender key
