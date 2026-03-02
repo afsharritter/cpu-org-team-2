@@ -42,29 +42,18 @@ This program will have the following responsibilities:
    a. Generate public/private keys.
    b. Encrypt a message.
    c. Decrypt a file.
-
-   Menu System:
-```
----- RSA Encryption Program ----
-1. Generate Public and Private Keys
-2. Encrypt a Message
-3. Decrypt a Message
-4. Exit
-
-Enter a choice (1-4):
-```
-3. Generate Private and Public Keys
+2. Generate Private and Public Keys
    a. Prompt the user to enter values for `p`, `q`, and `e`.
    b. Check if `p` and `q` are prime.
    c. Calculate `n = p * q`
    d. Calculate `phi = (p - 1) * (q - 1)`
    e. Validate that `e` is a positive integer, $1 < e < phi$, and `e` is coprime to `phi` through the function called `cpubexp`
    f. Calculate the private key `d` such that $d = (1 + x * phi) / e$.
-4. Encrypt a message
+3. Encrypt a message
    a. Prompt the user to enter a message.
    b. Encrypt each character in sequence via the `encrypt` function.
    c. Save the encrypted message in a file called `encrypted.txt`.
-5. Decrypt a message
+4. Decrypt a message
    a. Open the file called `encrypted.txt`.
    b. Decrypt each character in sequence using the `decrypt` function.
    c. Save the decrypted message in a file called `decrypted.txt`.
