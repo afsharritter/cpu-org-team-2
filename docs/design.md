@@ -176,11 +176,32 @@ Outputs:
 
 - phi, the Euler totient, (p - 1) \* (q - 1)
 
+`isPositive(e)`
+
+Inputs:
+
+- e, an integer
+
+Outputs:
+
+- 0 if not positive, 1 if positive
+
+`isELessThanPhi(e, phi)`
+
+Inputs:
+
+- e, an integer
+- phi, the Euler totient
+
+Outputs:
+
+- 0 if greater than phi, 1 if less than phi
+
 `gcd(e, phi)`
 
 Inputs:
 
-- e, a positive integer
+- e, an integer
 - phi, the Euler totient
 
 Outputs:
@@ -191,16 +212,18 @@ Outputs:
 
 Inputs:
 
-- e, a positive integer
+- e, an integer
 - phi, the Euler totient, (p - 1) \* (q - 1)
 
 Outputs:
 
-- 0 if the result from gcd() is not 1, and 1 if the result from gcd() is 1
+- 0 if not valid, 1 if valid
 
 Calls:
 
 - gcd()
+- isPositive()
+- isELessThanPhi()
 
 `cpubexp(p, q, e)`
 
@@ -220,6 +243,56 @@ Calls:
 - calc_n()
 - calc_phi()
 - isValid_e()
+
+`modinv(e, phi)`
+
+Inputs:
+
+- e, a positive integer
+- phi, the Euler totient
+
+Outputs:
+
+- d, the modular inverse
+
+`cprivexp(e, phi)`
+
+Inputs:
+
+- e, a positive integer
+- phi, the Euler totient
+
+Outputs:
+
+- d, the private key
+
+Calls:
+
+- modinv()
+
+
+`pow(c, d)`
+
+Inputs:
+
+- c, the cipher
+- d, the private key
+
+Outputs:
+
+- p, the result of c raised d
+
+
+`mod(n)`
+
+Inputs:
+
+- n, the modulus
+
+Outputs:
+
+- the result of mod(n)
+
 
 `decrypt(c, d, n)`
 
