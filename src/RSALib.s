@@ -40,6 +40,7 @@ pow:
 .Lpow_end:
     # Return to caller
     POP {r4, pc}
+#END OF pow
 
 #
 # Function Name: modulo
@@ -70,6 +71,7 @@ modulo:
     # Fallback for division by zero
     MOV r0, #0
     POP {pc}
+#END OF modulo
 
 #
 # Function Name: isPrime
@@ -123,6 +125,6 @@ isPrime:
     # Return 1 (True)
     MOV r0, #1          
     POP {r4, r5, pc}
-
+#END OF isPrime
 
 #ENDRSALib.s
