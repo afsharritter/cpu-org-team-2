@@ -8,6 +8,10 @@
 .global pow
 .global modulo
 .global isPrime
+.global gcd
+.global calc_n
+.global calc_phi
+
 
 .text
 
@@ -126,5 +130,72 @@ isPrime:
     MOV r0, #1          
     POP {r4, r5, pc}
 #END OF isPrime
+
+gcd:
+    # push the stack
+    SUB sp, sp, #4
+    STR lr, [sp, #0]
+
+    # use the euclidean algorithm to determine the gcd
+    # find the larger number, put larger in r0 and smaller in r1
+    CMP r0, r1
+    BGE Euclidean
+        EOR r0, r0, r1
+        EOR r1, r0, r1
+        EOR r0, r0, r1
+    
+    # divide the larger by the smaller, then divide each subsequent result by the remainder
+    Euclidean:
+        MOV r3, r0 // save larger
+        MOV r4, r1 // save smaller
+        BL __aeabi_idiv // multiplier in r0, dividend in r1, remainder in r3
+
+        MOV r5, #0 // want the remainder to be zero
+        CMP r3, r5
+        BEQ EndLoop
+            # get next value for the next divisor
+            MOV r0, r1
+            # get value for next dividend
+            MOV r1, r3
+            B Euclidean
+
+    EndLoop:
+        // the final dividend should be in r0 already
+
+    # pop the stack
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    MOV pc, lr
+#END gcd
+
+calc_n:
+    # push the stack
+    SUB sp, sp, #4
+    STR lr, [sp, #0]
+
+    MUL r0, r0, r1 // return the product of the two inputs
+
+    # pop the stack
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    MOV pc, lr
+#END calc_n
+
+calc_phi:
+    # push the stack
+    SUB sp, sp, #4
+    STR lr, [sp, #0]
+
+    SUB r0, r0, #1 // first value minus 1
+
+    SUB r1, r1, #1 // second value minus 1
+
+    MUL r0, r0, r1 // return the product of (r0 - 1)(r1 - 1)
+    
+    # pop the stack
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    MOV pc, lr
+#END calc_phi
 
 #ENDRSALib.s
