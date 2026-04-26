@@ -8,6 +8,11 @@
 .global pow
 .global modulo
 .global isPrime
+.global gcd
+.global calcN
+.global calcPhi
+.global cpubexp
+
 
 .text
 
@@ -126,5 +131,132 @@ isPrime:
     MOV r0, #1          
     POP {r4, r5, pc}
 #END OF isPrime
+
+calcN:
+    # push the stack
+    SUB sp, sp, #4
+    STR lr, [sp, #0]
+
+    MUL r0, r0, r1 // return the product of the two inputs
+
+    # pop the stack
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    MOV pc, lr
+#END calc_n
+
+calcPhi:
+    # push the stack
+    SUB sp, sp, #4
+    STR lr, [sp, #0]
+
+    SUB r0, r0, #1 // first value minus 1
+
+    SUB r1, r1, #1 // second value minus 1
+
+    MUL r0, r0, r1 // return the product of (r0 - 1)(r1 - 1)
+    
+    # pop the stack
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    MOV pc, lr
+#END calc_phi
+
+cpubexp:
+    # push the stack
+    SUB sp, sp, #4
+    STR lr, [sp, #0]
+
+    # assume phi is in r0, e is in r1
+    MOV r10, r0 // save phi
+    MOV r11, r1 // save e
+    
+    # if e is not postive, greater than phi, or if they are not coprime, return an error
+    # init logical variables:
+    MOV r4, #0 //positive
+    MOV r5, #0  //less than phi
+    MOV r6, #0 //
+    MOV r7, #0 //coprime 
+
+    CMP r11, #0
+    ADDGE r4, #1
+    
+    CMP r11, r10
+    ADDLE r5, #1
+
+    AND r6, r4, r5
+    CMP r6, #1
+    BNE Error1 
+        BL gcd // phi in r0 and e in r1
+        CMP r0, #1
+        BGT Error2
+            # update status code
+            MOV r0, #0
+            B EndFunction 
+    Error1:
+        # output error and return status code
+        LDR r0, =error1
+        BL printf
+        MOV r0, #1
+        B EndFunction
+
+    Error2: 
+        # output error and return status code
+        LDR r0, =error2
+        BL printf
+        MOV r0, #1
+        B EndFunction
+
+    EndFunction:
+
+    # pop the stack
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    MOV pc, lr
+
+.text
+gcd:
+    # push the stack
+    SUB sp, sp, #4
+    STR lr, [sp, #0]
+
+    # use the euclidean algorithm to determine the gcd
+    # find the larger number, put larger in r0 and smaller in r1
+    CMP r0, r1
+    BGE Euclidean
+        EOR r0, r0, r1
+        EOR r1, r0, r1
+        EOR r0, r0, r1
+    
+    # divide the larger by the smaller, then divide each subsequent result by the remainder
+    Euclidean:
+        MOV r4, r0 // save larger
+        MOV r5, r1 // save smaller
+        BL __aeabi_idiv
+        MUL r6, r0, r5 // actual product
+        SUB r7, r4, r6 // remainder
+
+        MOV r8, #0 // want the remainder to be zero
+        CMP r7, r8
+        BEQ EndLoop
+            # get next value for the next divisor
+            MOV r0, r5
+            # get value for next dividend
+            MOV r1, r7
+            B Euclidean
+
+    EndLoop:
+        MOV r0, r5 // put the smaller back in r0
+        // the final dividend should be in r0 already
+
+    # pop the stack
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    MOV pc, lr
+#END gcd
+
+.data
+    error1: .asciz "The value of e is not positive or is greater than phi. \n"
+    error2: .asciz "Phi and e are not coprime. \n"
 
 #ENDRSALib.s
