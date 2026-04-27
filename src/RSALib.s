@@ -12,7 +12,8 @@
 .global calcN
 .global calcPhi
 .global cpubexp
-
+.global encrypt
+.global decrypt
 
 .text
 
@@ -258,5 +259,67 @@ gcd:
 .data
     error1: .asciz "The value of e is not positive or is greater than phi. \n"
     error2: .asciz "Phi and e are not coprime. \n"
+
+#
+# Function Name: encrypt
+# Purpose: Encrypts a single plaintext character using RSA.
+#          Computes c = m^e mod n by calling pow then modulo.
+# Inputs:
+#   - r0: m (plaintext character as integer)
+#   - r1: e (public key exponent)
+#   - r2: n (modulus)
+# Outputs:
+#   - r0: c (ciphertext integer)
+#
+
+.type encrypt, %function
+encrypt:
+    SUB sp, sp, #12
+    STR lr, [sp, #0]
+    STR r4, [sp, #4]
+    STR r5, [sp, #8]
+    MOV r4, r1
+    MOV r5, r2
+    BL  pow
+    MOV r1, r5
+    BL  modulo
+    LDR r5, [sp, #8]
+    LDR r4, [sp, #4]
+    LDR lr, [sp, #0]
+    ADD sp, sp, #12
+    MOV pc, lr
+#END encrypt
+ 
+
+#
+# Function Name: decrypt
+# Purpose: Decrypts a single ciphertext integer using RSA.
+#          Computes m = c^d mod n by calling pow then modulo.
+# Inputs:
+#   - r0: c (ciphertext integer)
+#   - r1: d (private key exponent)
+#   - r2: n (modulus)
+# Outputs:
+#   - r0: m (plaintext character as integer)
+#
+
+.type decrypt, %function
+decrypt:
+    SUB sp, sp, #12
+    STR lr, [sp, #0]
+    STR r4, [sp, #4]
+    STR r5, [sp, #8]
+    MOV r4, r1
+    MOV r5, r2
+    BL  pow
+    MOV r1, r5
+    BL  modulo
+    LDR r5, [sp, #8]
+    LDR r4, [sp, #4]
+    LDR lr, [sp, #0]
+    ADD sp, sp, #12
+    MOV pc, lr
+    
+#END decrypt
 
 #ENDRSALib.s
