@@ -107,10 +107,10 @@ main:
     msg_n5:   .asciz "calcN Test 5: 47, 43 | Exp: 2021 | Act: %d\n\n"
 
     # calcPhu
-    msg_phi1: .asciz "calcPhi Test 5: 7, 11  | Exp: 60   | Act: %d\n"
-    msg_phi2: .asciz "calcPhi Test 5: 13, 17 | Exp: 192  | Act: %d\n"
-    msg_phi3: .asciz "calcPhi Test 5: 1, 11  | Exp: 0    | Act: %d\n"
-    msg_phi4: .asciz "calcPhi Test 5: 2, 2   | Exp: 1    | Act: %d\n"
+    msg_phi1: .asciz "calcPhi Test 1: 7, 11  | Exp: 60   | Act: %d\n"
+    msg_phi2: .asciz "calcPhi Test 2: 13, 17 | Exp: 192  | Act: %d\n"
+    msg_phi3: .asciz "calcPhi Test 3: 1, 11  | Exp: 0    | Act: %d\n"
+    msg_phi4: .asciz "calcPhi Test 4: 2, 2   | Exp: 1    | Act: %d\n"
     msg_phi5: .asciz "calcPhi Test 5: 47, 43 | Exp: 1932 | Act: %d\n\n"
 
     # gcd
