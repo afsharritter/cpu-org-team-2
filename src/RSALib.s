@@ -271,21 +271,25 @@ gcd:
 # Outputs:
 #   - r0: c (ciphertext integer)
 #
-.text
+
 .type encrypt, %function
-
 encrypt:
-    PUSH {r4, r5, lr}
-    MOV  r4, r1
-    MOV  r5, r2
-    BL   pow
-    MOV  r1, r5
-    BL   modulo
-    POP  {r4, r5, pc}
-
-
+    SUB sp, sp, #12
+    STR lr, [sp, #0]
+    STR r4, [sp, #4]
+    STR r5, [sp, #8]
+    MOV r4, r1
+    MOV r5, r2
+    BL  pow
+    MOV r1, r5
+    BL  modulo
+    LDR r5, [sp, #8]
+    LDR r4, [sp, #4]
+    LDR lr, [sp, #0]
+    ADD sp, sp, #12
+    MOV pc, lr
 #END encrypt
-
+ 
 
 #
 # Function Name: decrypt
@@ -299,18 +303,23 @@ encrypt:
 #   - r0: m (plaintext character as integer)
 #
 
-.text
-.type encrypt, %function
-
+.type decrypt, %function
 decrypt:
-    PUSH {r4, r5, lr}
-    MOV  r4, r1
-    MOV  r5, r2
-    BL   pow
-    MOV  r1, r5
-    BL   modulo
-    POP  {r4, r5, pc}
-
+    SUB sp, sp, #12
+    STR lr, [sp, #0]
+    STR r4, [sp, #4]
+    STR r5, [sp, #8]
+    MOV r4, r1
+    MOV r5, r2
+    BL  pow
+    MOV r1, r5
+    BL  modulo
+    LDR r5, [sp, #8]
+    LDR r4, [sp, #4]
+    LDR lr, [sp, #0]
+    ADD sp, sp, #12
+    MOV pc, lr
+    
 #END decrypt
 
 #ENDRSALib.s
