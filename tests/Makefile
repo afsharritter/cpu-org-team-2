@@ -1,3 +1,4 @@
+#Makefile for testing RSALib.s
 all: run_tests_RSALib
 
 run_tests_RSALib: test_RSALib.o RSALib.o
