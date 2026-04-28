@@ -2,7 +2,7 @@
 # Program Name: test_RSALib.s
 # Author: Team 2
 # Date: 04/17/2026
-# Purpose: Automated Unit Testing for RSALib math functions using macro.
+# Purpose: Unit Testing for RSALib math functions using macro.
 #
 
 .syntax unified
