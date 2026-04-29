@@ -110,7 +110,8 @@ modinv_loop_complete:
 return_old_c_negative:
     LDR r0, =old_c
     LDR r0, [r0]
-    ADD r0, r0, r4      # grab phi parked in r4 for this purpose
+    #grab phi parked in r4 for this purpose
+    ADD r0, r0, r4
     B modinv_complete
 
 modinv_complete: 
