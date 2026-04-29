@@ -274,7 +274,8 @@ dec_token_loop_end:
     BL   printf
  
     B    dec_return
- 
+
+# decryptMain error handling
 dec_err_no_file:
     LDR  r0, =dec_err_file_msg
     BL   printf
@@ -324,6 +325,7 @@ dec_return:
     read_buf:           .skip 513
     dec_msg_hdr:        .asciz "\nDecrypted message:\n"
     dec_str_success:    .asciz "Decryption Complete. Output written to plaintext.txt.\n"
+    # error handling
     dec_err_file_msg:   .asciz "Error: encrypted.txt not found.\n"
     dec_err_empty_msg:  .asciz "Error: encrypted.txt is empty.\n"
     dec_err_plain_msg:  .asciz "Error: Could not open plaintext.txt for writing.\n"
