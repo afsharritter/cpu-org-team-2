@@ -12,17 +12,47 @@ main:
     SUB sp, sp, #4          
     STR lr, [sp, #0]
 
-    ## TODO: prompt for user input: generate keys, encrypt, or decrypt?
+    main_loop:
+        #Print menu
+        LDR r0, =menu_prompt
+        BL  printf
 
-    ## TODO: Option 1: Generate keys
-        ## TODO: prompt user for p + q, limit < 50 and check input
+        # Read user choice into menu_choice
+        LDR r0, =fmt_int
+        LDR r1, =menu_choice
+        BL  scanf
 
-        ## TODO: call cpubexp and cprivexp, output to keys.txt
+        # Load chosen value
+        LDR r0, =menu_choice
+        LDR r0, [r0]
 
-    ## TODO: Option 2: Encrypt a message: call encrypt, which already saves the encrypted message to encrypted.txt
+        #Branch to selected option
+        CMP r0, #1
+        BEQ main_generate_keys
+        CMP r0, #2
+        BEQ main_encrypt
+        CMP r0, #3
+        BEQ main_decrypt
 
-    ## TODO: Option 3: Decrypt a message: call decrypt, which already saves to plaintext.txt
-    
+        # Invalid input, loop again
+        LDR r0, =menu_invalid
+        BL  printf
+        B   main_loop
+
+    main_generate_keys:
+        # TODO: Generate keys — prompt for p, q, e; call cpubexp/cprivexp; save to keys.txt
+        
+
+    main_encrypt:
+        #Encrypt a message
+        BL  encryptMain
+        B   main_loop
+
+    main_decrypt:
+        #Decrypt a message
+        BL  decryptMain
+        B   main_loop
+
     @ Pop the Stack 
     LDR lr, [sp, #0]
     ADD sp, sp, #4
@@ -37,21 +67,21 @@ encryptMain:
     LDR  r0, =prompt_message
     BL   printf
  
-    LDR  r0, =fmt_str
+        LDR  r0, =fmt_str
     LDR  r1, =message_buf
     BL   scanf
  
     # Prompt and read public key exponent (e)
     LDR  r0, =prompt_e
-    BL   printf
+    BL   printf 
  
     LDR  r0, =fmt_int
     LDR  r1, =val_e
-    BL   scanf
+    BL   scanf 
  
     # Prompt and read modulus (n)
     LDR  r0, =prompt_n
-    BL   printf
+    BL   printf 
  
     LDR  r0, =fmt_int
     LDR  r1, =val_n
@@ -63,15 +93,40 @@ encryptMain:
     BL   fopen
     MOV  r8, r0
  
-    # Load e and n
+    # Load e->r4 and n->r5 and input array ptr -> r6
     LDR  r4, =val_e
-    LDR  r4, [r4]
+    LDR  r4, [r4] 
  
     LDR  r5, =val_n
     LDR  r5, [r5]
- 
+
     LDR  r6, =message_buf
- 
+
+    # Loop: for each char in input array, compute c = m^e mod n
+    # and write c as a space-separated integer to encrypted.txt
+    encryptMain_loop:
+        #load next byte from input char array
+        LDRB r0, [r6]
+        #null terminator = end of array
+        CMP  r0, #0
+        BEQ  encryptMain_loop_done
+        #r1 = e
+        MOV  r1, r4
+        #r2 = n
+        MOV  r2, r5
+        BL   encrypt
+        # r3 = r0 = c = m^e mod n, save ciphertext value
+        MOV  r3, r0
+        #r0 = file pointer
+        MOV  r0, r8
+        LDR  r1, =fmt_enc_out
+        MOV  r2, r3
+        BL   fprintf
+        # advance to next element in input array
+        ADD  r6, r6, #1
+        B    encryptMain_loop
+    encryptMain_loop_done:
+
     # Close file
     MOV  r0, r8
     BL   fclose
@@ -127,8 +182,34 @@ decryptMain:
     LDR  r5, =val_n
     LDR  r5, [r5]
  
-    LDR  r6, =message_buf
- 
+    # Loop: read each space-delimited integer from encrypted.txt (input int array),
+    # compute m = c^d mod n, write ASCII char to plaintext.txt (output char array)
+    # r4 = d, r5 = n, r8 = encrypted.txt fp, r9 = plaintext.txt fp
+    decryptMain_loop:
+        # r8 file pointer (encrypted.txt)
+        MOV  r0, r8
+        LDR  r1, =fmt_int
+        #temp address for scanned integer
+        LDR  r2, =temp_val
+        BL   fscanf
+        #fscanf returns 1 on success, EOF otherwise
+        CMP  r0, #1
+        BNE  decryptMain_done
+        LDR  r0, =temp_val
+        #r0 = c (next integer from input array)
+        LDR  r0, [r0]
+        #r1 = d
+        MOV  r1, r4
+        # r2 = n
+        MOV  r2, r5
+        BL   decrypt
+        #r0 = m = c^d mod n -> ASCII char
+        #fputc(int c, FILE *stream): r0=char, r1=file pointer
+        MOV  r1, r9
+        BL   fputc
+        B    decryptMain_loop
+    decryptMain_done:
+
     # Close files
     MOV  r0, r8
     BL   fclose
@@ -162,17 +243,25 @@ decryptMain:
     enc_file_name:      .asciz "../data/encrypted.txt"
     plain_file_name:    .asciz "../data/plaintext.txt"
     message_buf:        .skip 100
+
+    # Main menu
+    menu_prompt:        .asciz "\nRSA Menu:\n  1. Generate Keys\n  2. Encrypt a Message\n  3. Decrypt a Message\nEnter choice: "
+    menu_invalid:       .asciz "Invalid choice. Please enter 1, 2, or 3.\n"
+    menu_choice:        .word 0
  
     # Encrypt
     prompt_message:     .asciz "Enter plaintext message: \n"
     prompt_e:           .asciz "Enter public key exponent (e): \n"
     val_e:              .word 0
+    fmt_enc_out:        .asciz "%d "    @ space-separated integer format for output array
     enc_str_success:    .asciz "Encryption Complete. Output written to encrypted.txt."
  
     # Decrypt
     prompt_d:           .asciz "Enter private key exponent (d): \n"
     val_d:              .word 0
     val_n:              .word 0
-    dec_str_success:    .asciz "Encryption Completed. Output written to plaintext.txt."
+    dec_str_success:    .asciz "Decryption Complete. Output written to plaintext.txt."
+    #scratch word for fscanf
+    temp_val:           .word 0
  
 # END RSA.s
