@@ -141,7 +141,7 @@ generateKeys:
 
     generateKeys_pubexp_loop:
         # prompt user to enter e
-        LDR r0, =prompt_e
+        LDR r0, =prompt_e_gen
         LDR r1, =phi_val
         LDR r1, [r1]
         BL printf
@@ -427,7 +427,7 @@ decryptMain:
     prompt_p:           .asciz "Enter a prime value for p: "
     prompt_q:           .asciz "Enter a prime value for q: "
     pq_error_msg:       .asciz "Error. The value %d is not prime. Please try again.\n"
-    prompt_e:           .asciz "Enter a value for e, such that 1 < e < %d: "
+    prompt_e_gen:       .asciz "Enter a value for e, such that 1 < e < %d: "
     e_error_msg:        .asciz "Error. The value for e [ %d ] must be greater than 1 and less than %d. Please try again.\n "
     print_keys_msg:     .asciz "Success!\n  Your public key exponent (e) is: %d\n  Your private key exponent (d) is: %d\n  Your modulus (n) is: %d\n"
     p_val:              .word 0
