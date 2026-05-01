@@ -5,7 +5,7 @@ SRC   = src
 TESTS = tests
 BIN   = bin
 
-all: $(BIN) $(BIN)/rsa $(BIN)/run_tests_RSALib $(BIN)/run_tests_decrypt $(BIN)/run_tests_encrypt $(BIN)/run_tests_modinv
+all: $(BIN) $(BIN)/rsa $(BIN)/run_tests_RSALib $(BIN)/run_tests_decrypt $(BIN)/run_tests_encrypt $(BIN)/run_tests_modinv $(BIN)/run_tests_cpubexp
 
 # Main RSA program
 $(BIN)/rsa: $(BIN)/RSA.o $(BIN)/RSALib.o $(BIN)/modinv.o
@@ -26,6 +26,12 @@ $(BIN)/run_tests_RSALib: $(BIN)/test_RSALib.o $(BIN)/RSALib.o
 
 $(BIN)/test_RSALib.o: $(TESTS)/test_RSALib.s
 	gcc -c $(TESTS)/test_RSALib.s -o $(BIN)/test_RSALib.o
+
+$(BIN)/run_tests_cpubexp: $(BIN)/test_cpubexp.o $(BIN)/cpubexp.o
+	gcc $(BIN)/test_cpubexp.o $(BIN)/cpubexp.o -o $(BIN)/run_tests_cpubexp
+
+$(BIN)/test_cpubexp.o: $(TESTS)/test_cpubexp.s
+	gcc -c $(TESTS)/test_cpubexp.s -o $(BIN)/test_cpubexp.o
 
 $(BIN)/run_tests_decrypt: $(BIN)/test_decrypt.o $(BIN)/RSALib.o
 	gcc $(BIN)/test_decrypt.o $(BIN)/RSALib.o -o $(BIN)/run_tests_decrypt
