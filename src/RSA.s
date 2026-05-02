@@ -6,6 +6,16 @@
 #
 
 .text
+
+# Function Name: main
+# Purpose: Program entry point. Displays the RSA menu in a loop and dispatches
+#          to generateKeys, encryptMain, or decryptMain based on user input.
+#          Returns to the C runtime when the user selects Exit (option 4).
+# Inputs:
+#   none
+# Outputs:
+#   none
+# lr: saved at [sp+0] so we can return to the C runtime
 .global main
 main:
     @ Push the Stack 
@@ -65,6 +75,17 @@ main:
     LDR lr, [sp, #0]
     ADD sp, sp, #4
     MOV pc, lr
+
+# Function Name: generateKeys
+# Purpose: Generate an RSA key pair and save it to data/keys.txt.
+# Prompts for primes p and q, computes n = p*q and phi, prompts for e (validated by cpubexp), derives d = modinv(e, phi) via cprivexp, then prints and writes the key set.
+# Inputs:
+#   all values read from stdin
+# Outputs:
+#   results printed to stdout and saved to data/keys.txt
+# Registers used:
+#   r4: holds n_val when building the fprintf argument list
+#   r5: file ptr for data/keys.txt
 .global generateKeys
 generateKeys:
     # push the stack
@@ -237,7 +258,7 @@ generateKeys:
         LDR r2, =e_val
         LDR r2, [r2]
         LDR r3, =d_val
-        LDR r3, [r3]
+         LDR r3, [r3]
 
         # write to the file using fprintf
         BL fprintf
@@ -262,6 +283,20 @@ generateKeys:
         ADD sp, sp, #16
         MOV pc, lr
 # END generate
+
+# Function Name: encryptMain
+# Purpose: Encrypt a plaintext message using RSA public-key encryption. Reads the message (up to 127 chars), exponent e and modulus n
+# from stdin, then for each character m computes c = m^e mod n and writes the space-separated ciphertext integers to data/encrypted.txt.
+# Inputs:
+#   message and keys read from stdin
+# Outputs:
+#   ciphertext written to data/encrypted.txt
+# Registers used:
+#   r4: e (public exponent)
+#   r5: n (modulus)
+#   r6: walking pointer through message_buf
+#   r7: FILE* for data/encrypted.txt
+
 .global encryptMain
 encryptMain:
     SUB  sp, sp, #24
@@ -318,8 +353,8 @@ encryptMain:
     LDR  r0, =enc_file_name
     LDR  r1, =mode_w
     BL   fopen
-    MOV  r8, r0
-    CMP  r8, #0
+    MOV  r7, r0
+    CMP  r7, #0
     BEQ  encryptMain_file_error
     # Load e->r4 and n->r5 and input array ptr -> r6
     LDR  r4, =val_e
@@ -345,7 +380,7 @@ encryptMain:
         # r3 = r0 = c = m^e mod n, save ciphertext value
         MOV  r3, r0
         #r0 = file pointer
-        MOV  r0, r8
+        MOV  r0, r7
         LDR  r1, =fmt_enc_out
         MOV  r2, r3
         BL   fprintf
@@ -355,7 +390,7 @@ encryptMain:
     encryptMain_loop_done:
 
     # Close file
-        MOV  r0, r8
+        MOV  r0, r7
         BL   fclose
  
     # Print success message
@@ -379,7 +414,6 @@ encryptMain:
         B    encryptMain_exit
 
     encryptMain_exit:
-    LDR  r8, [sp, #20]
     LDR  r7, [sp, #16]
     LDR  r6, [sp, #12]
     LDR  r5, [sp, #8]
@@ -391,22 +425,30 @@ encryptMain:
 #END encryptMain
 
 
+# Function Name: decryptMain
+# Purpose: Decrypt ciphertext produced by encryptMain using RSA. Reads private exponent d and modulus n from stdin, reads each
+# space-delimited ciphertext integer c from data/encrypted.txt, computes m = c^d mod n, and writes the recovered ASCII characters
+# to data/plaintext.txt.
+# Inputs:
+#   d and n read from stdin; ciphertext read from data/encrypted.txt
+# Outputs:
+#   plaintext written to data/plaintext.txt
+# Registers used:
+#   r4: d (private exponent)
+#   r5: n (modulus)
+#   r6: count of chars written to detect empty ciphertext file
+#   r7: FILE* for data/plaintext.txt (output)
+#   r8: FILE* for data/encrypted.txt (input)
+
 .global decryptMain
 decryptMain:
-    SUB  sp, sp, #28
+    SUB  sp, sp, #24
     STR  lr, [sp, #0]
-    # r4 = d
     STR  r4, [sp, #4]
-    # r5 = n
     STR  r5, [sp, #8]
-    # r6 = count of decrypted chars
     STR  r6, [sp, #12]
-    # r7 = unused, padding for alignment
     STR  r7, [sp, #16]
-    # r8 = encrypted.txt file pointer
     STR  r8, [sp, #20]
-    # r9 = plaintext.txt file pointer
-    STR  r9, [sp, #24]
 
     # Prompt and read private exponent (d)
     LDR  r0, =prompt_d
@@ -454,8 +496,8 @@ decryptMain:
     LDR  r0, =plain_file_name
     LDR  r1, =mode_w
     BL   fopen
-    MOV  r9, r0
-    CMP  r9, #0
+    MOV  r7, r0
+    CMP  r7, #0
     BEQ  decryptMain_file_plain_error
 
     # Load d and n
@@ -485,7 +527,7 @@ decryptMain:
         BL   decrypt
         #r0 = m = c^d mod n -> ASCII char
         #fputc(int c, FILE *stream): r0=char, r1=file pointer
-        MOV  r1, r9
+        MOV  r1, r7
         BL   fputc
         # Increment count
         ADD  r6, r6, #1
@@ -495,7 +537,7 @@ decryptMain:
         BEQ  decryptMain_empty_cipher
         MOV  r0, r8
         BL   fclose
-        MOV  r0, r9
+        MOV  r0, r7
         BL   fclose
         LDR  r0, =dec_str_success
         BL   printf
@@ -504,7 +546,7 @@ decryptMain:
     decryptMain_empty_cipher:
         MOV  r0, r8
         BL   fclose
-        MOV  r0, r9
+        MOV  r0, r7
         BL   fclose
         LDR  r0, =err_empty_cipher
         BL   printf
@@ -535,19 +577,24 @@ decryptMain:
         B    decryptMain_exit
 
     decryptMain_exit:
-    LDR  r9, [sp, #24]
     LDR  r8, [sp, #20]
     LDR  r7, [sp, #16]
     LDR  r6, [sp, #12]
     LDR  r5, [sp, #8]
     LDR  r4, [sp, #4]
     LDR  lr, [sp, #0]
-    ADD  sp, sp, #28
+    ADD  sp, sp, #24
     MOV  pc, lr
 
 #END decryptMain
 
-@ Drain stdin until newline — call after a failed scanf to prevent infinite loops
+# Function Name: drain_stdin
+# Purpose: Consume and discard all characters in the stdin buffer up to and including the next newline. Called after a failed scanf to clear
+# stale bytes so the next scanf attempt does not fail immediately.
+# Inputs:
+#   none
+# Outputs:
+#   none
 .global drain_stdin
 drain_stdin:
     SUB  sp, sp, #4
