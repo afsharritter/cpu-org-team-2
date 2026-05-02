@@ -5,6 +5,7 @@
 # Purpose: A code library containing  mathematical functions to implement the RSA algorithm.
 #
 
+.global pow_mod
 .global pow
 .global modulo
 .global isPrime
@@ -49,6 +50,59 @@ pow:
     # Return to caller
     POP {r4, pc}
 #END OF pow
+
+
+# Function Name: pow_mod
+# Modular exponentiation: result = base^exp mod n.
+# Reduces mod n at every multiplication to prevent overflow.
+# Max intermediate value: (n-1)^2 = 76^2 = 5776 (safe in 32-bit).
+# Inputs
+# r0: base
+# r1: exponent
+# r2: modulus n
+# Outputs:
+#  r0: base^exp mod n
+pow_mod:
+    # push the stack
+    SUB  sp, sp, #20
+    STR  lr, [sp, #0]
+    STR  r4, [sp, #4]
+    STR  r5, [sp, #8]
+    STR  r6, [sp, #12]
+    STR  r7, [sp, #16]
+    # r4 = base
+    MOV  r4, r0
+    # r5 = exp (loop counter)
+    MOV  r5, r1
+    #r6 = n
+    MOV  r6, r2
+    #r7 = result
+    MOV  r7, #1
+
+    powmod_loop:
+        CMP  r5, #0
+        BEQ  powmod_done
+        # result = (result * base) mod n
+        # r0 = result * base
+        MUL  r0, r7, r4
+        #r1 = n
+        MOV  r1, r6
+        BL   modulo
+        MOV  r7, r0
+        SUBS r5, r5, #1
+        B    powmod_loop
+
+    powmod_done:
+        MOV  r0, r7
+        # pop the stack
+        LDR  r7, [sp, #16]
+        LDR  r6, [sp, #12]
+        LDR  r5, [sp, #8]
+        LDR  r4, [sp, #4]
+        LDR  lr, [sp, #0]
+        ADD  sp, sp, #20
+        MOV  pc, lr
+#END pow_mod
 
 #
 # Function Name: modulo
@@ -385,6 +439,7 @@ gcd:
     old_c: .word 0
     curr_c: .word 1
 
+.text
 #
 # Function Name: encrypt
 # Purpose: Encrypts a single plaintext character using RSA.
@@ -403,11 +458,8 @@ encrypt:
     STR lr, [sp, #0]
     STR r4, [sp, #4]
     STR r5, [sp, #8]
-    MOV r4, r1
-    MOV r5, r2
-    BL  pow
-    MOV r1, r5
-    BL  modulo
+    # r0=m, r1=e, r2=n -> call pow_mod(m, e, n)
+    BL  pow_mod
     LDR r5, [sp, #8]
     LDR r4, [sp, #4]
     LDR lr, [sp, #0]
@@ -434,17 +486,14 @@ decrypt:
     STR lr, [sp, #0]
     STR r4, [sp, #4]
     STR r5, [sp, #8]
-    MOV r4, r1
-    MOV r5, r2
-    BL  pow
-    MOV r1, r5
-    BL  modulo
+    # r0=c, r1=d, r2=n -> call pow_mod(c, d, n)
+    BL  pow_mod
     LDR r5, [sp, #8]
     LDR r4, [sp, #4]
     LDR lr, [sp, #0]
     ADD sp, sp, #12
     MOV pc, lr
-    
+
 #END decrypt
 
 #ENDRSALib.s
