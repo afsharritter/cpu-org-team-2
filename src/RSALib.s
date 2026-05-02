@@ -344,8 +344,9 @@ cpubexp:
     MOV r6, #0 //
     MOV r7, #0 //coprime 
 
-    CMP r11, #0
-    ADDGE r4, #1
+    #e must be strictly greater than 1
+    CMP r11, #1
+    ADDGT r4, #1
     
     CMP r11, r10
     ADDLE r5, #1
