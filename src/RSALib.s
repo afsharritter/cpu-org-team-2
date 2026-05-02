@@ -424,10 +424,6 @@ gcd:
 .data
     error1: .asciz "The value of e is not positive or is greater than phi. \n"
     error2: .asciz "Phi and e are not coprime. \n"
-    old_r: .word 0
-    curr_r: .word 0
-    old_c: .word 0
-    curr_c: .word 1
 
 .text
 #
