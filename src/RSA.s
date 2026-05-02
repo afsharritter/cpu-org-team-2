@@ -33,6 +33,8 @@ main:
         BEQ main_encrypt
         CMP r0, #3
         BEQ main_decrypt
+        CMP r0, #4
+        BEQ main_exit
 
         # Invalid input, loop again
         LDR r0, =menu_invalid
@@ -53,6 +55,8 @@ main:
         #Decrypt a message
         BL  decryptMain
         B   main_loop
+
+    main_exit:
 
     @ Pop the Stack 
     LDR lr, [sp, #0]
@@ -265,11 +269,11 @@ encryptMain:
     LDR  r1, =mode_w
     BL   fopen
     MOV  r8, r0
- 
+    CMP  r8, #0
+    BEQ  encryptMain_file_error
     # Load e->r4 and n->r5 and input array ptr -> r6
     LDR  r4, =val_e
-    LDR  r4, [r4] 
- 
+    LDR  r4, [r4]
     LDR  r5, =val_n
     LDR  r5, [r5]
 
@@ -307,7 +311,13 @@ encryptMain:
     # Print success message
     LDR  r0, =enc_str_success
     BL   printf
- 
+    B    encryptMain_exit
+
+encryptMain_file_error:
+    LDR  r0, =err_enc_file
+    BL   printf
+
+encryptMain_exit:
     LDR  lr, [sp, #0]
     ADD  sp, sp, #4
     MOV  pc, lr
@@ -409,18 +419,18 @@ decryptMain:
 .data
     # Shared
     prompt_n:           .asciz "Enter modulus (n): \n"
-    fmt_str:            .asciz "%127s"
+    fmt_str:            .asciz " %127[^\n]"
     fmt_int:            .asciz "%d"
     mode_r:             .asciz "r"
     mode_w:             .asciz "w"
-    enc_file_name:      .asciz "../data/encrypted.txt"
-    plain_file_name:    .asciz "../data/plaintext.txt"
-    keys_file_name:    .asciz "../data/keys.txt"
+    enc_file_name:      .asciz "data/encrypted.txt"
+    plain_file_name:    .asciz "data/plaintext.txt"
+    keys_file_name:    .asciz "data/keys.txt"
     message_buf:        .skip 100
 
     # Main menu
-    menu_prompt:        .asciz "\nRSA Menu:\n  1. Generate Keys\n  2. Encrypt a Message\n  3. Decrypt a Message\nEnter choice: "
-    menu_invalid:       .asciz "Invalid choice. Please enter 1, 2, or 3.\n"
+    menu_prompt:        .asciz "\nRSA Menu:\n  1. Generate Keys\n  2. Encrypt a Message\n  3. Decrypt a Message\n  4. Exit\nEnter choice: "
+    menu_invalid:       .asciz "Invalid choice. Please enter 1, 2, 3 or 4.\n"
     menu_choice:        .word 0
  
     # Generate Keys
@@ -442,7 +452,8 @@ decryptMain:
     prompt_e:           .asciz "Enter public key exponent (e): \n"
     val_e:              .word 0
     fmt_enc_out:        .asciz "%d "    @ space-separated integer format for output array
-    enc_str_success:    .asciz "Encryption Complete. Output written to encrypted.txt."
+    enc_str_success:    .asciz "Encryption Complete. Output written to encrypted.txt.\n"
+    err_enc_file:       .asciz "Error: could not open encrypted.txt for writing. Check data/ directory exists.\n"
  
     # Decrypt
     prompt_d:           .asciz "Enter private key exponent (d): \n"
