@@ -22,8 +22,8 @@ main:
     LDR r1, =phi
     LDR r1, [r1]
 
-    @ Call modinv
-    BL modinv           @ returns d in r0
+    @ Call cprivexp
+    BL cprivexp           @ returns d in r0
 
     @ Store d_out
     LDR r1, =d_out
@@ -48,8 +48,6 @@ main_false:
     LDR r1, =d_out
     LDR r1, [r1]
     BL printf
-    B main_end
-
 
 main_end:
     @ Pop the stack

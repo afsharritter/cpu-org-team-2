@@ -8,8 +8,8 @@ BIN   = bin
 all: $(BIN) $(BIN)/rsa $(BIN)/run_tests_RSALib $(BIN)/run_tests_decrypt $(BIN)/run_tests_encrypt $(BIN)/run_tests_modinv $(BIN)/run_tests_cpubexp
 
 # Main RSA program
-$(BIN)/rsa: $(BIN)/RSA.o $(BIN)/RSALib.o $(BIN)/modinv.o
-	gcc $(BIN)/RSA.o $(BIN)/RSALib.o $(BIN)/modinv.o -o $(BIN)/rsa
+$(BIN)/rsa: $(BIN)/RSA.o $(BIN)/RSALib.o
+	gcc $(BIN)/RSA.o $(BIN)/RSALib.o -o $(BIN)/rsa
 
 $(BIN)/RSA.o: $(SRC)/RSA.s
 	gcc -c $(SRC)/RSA.s -o $(BIN)/RSA.o
@@ -45,8 +45,8 @@ $(BIN)/run_tests_encrypt: $(BIN)/test_encrypt.o $(BIN)/RSALib.o
 $(BIN)/test_encrypt.o: $(TESTS)/test_encrypt.s
 	gcc -c $(TESTS)/test_encrypt.s -o $(BIN)/test_encrypt.o
 
-$(BIN)/run_tests_modinv: $(BIN)/test_modinv.o $(BIN)/modinv.o
-	gcc $(BIN)/test_modinv.o $(BIN)/modinv.o -o $(BIN)/run_tests_modinv
+$(BIN)/run_tests_modinv: $(BIN)/test_modinv.o $(BIN)/RSALib.o
+	gcc $(BIN)/test_modinv.o $(BIN)/RSALib.o -o $(BIN)/run_tests_modinv
 
 $(BIN)/test_modinv.o: $(TESTS)/test_modinv.s
 	gcc -c $(TESTS)/test_modinv.s -o $(BIN)/test_modinv.o
