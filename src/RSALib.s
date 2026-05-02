@@ -12,6 +12,7 @@
 .global gcd
 .global calcN
 .global calcPhi
+.global calcPhiEqual
 .global cpubexp
 .global cprivexp
 .global modinv
@@ -218,6 +219,18 @@ calcPhi:
     ADD sp, sp, #4
     MOV pc, lr
 #END calc_phi
+
+calcPhiEqual:
+    SUB sp, sp, #4
+    STR lr, [sp, #0]
+    # r1 = p-1
+    SUB r1, r0, #1
+    # r0 = p*(p-1)
+    MUL r0, r0, r1
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    MOV pc, lr
+#END calcPhiEqual
 
 
 cprivexp:

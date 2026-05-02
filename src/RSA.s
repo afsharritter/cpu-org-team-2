@@ -21,6 +21,9 @@ main:
         LDR r0, =fmt_int
         LDR r1, =menu_choice
         BL  scanf
+        CMP r0, #1
+        # Flush bad input from stdin
+        BLNE drain_stdin
 
         # Load chosen value
         LDR r0, =menu_choice
@@ -78,6 +81,9 @@ generateKeys:
         LDR r0, =fmt_int
         LDR r1, =p_val
         BL scanf
+        CMP r0, #1
+        # Flush bad input from stdin
+        BLNE drain_stdin
 
         # call isPrime(p_val) to determine if the value is prime.
         LDR r0, =p_val
@@ -103,6 +109,9 @@ generateKeys:
         LDR r0, =fmt_int
         LDR r1, =q_val
         BL scanf
+        CMP r0, #1
+        # Flush bad input from stdin
+        BLNE drain_stdin
 
         # call isPrime(q_val) to determine if the value is prime.
         LDR r0, =q_val
@@ -138,8 +147,17 @@ generateKeys:
         LDR r0, [r0]
         LDR r1, =q_val
         LDR r1, [r1]
+        CMP r0, r1
+        BEQ generateKeys_phi_equal
+        # p != q: phi = (p-1)*(q-1)
         BL calcPhi
-        # calcPhi return phi in r0, store it in the phi_val variable
+        B  generateKeys_phi_store
+        # special case when p=q
+        generateKeys_phi_equal:
+            # p == q: phi = p*(p-1)
+            BL calcPhiEqual
+    generateKeys_phi_store:
+        # store phi result in phi_val
         LDR r1, =phi_val
         STR r0, [r1]
 
@@ -153,6 +171,9 @@ generateKeys:
         LDR r0, =fmt_int
         LDR r1, =e_val
         BL scanf
+        CMP r0, #1
+        # Flush bad input from stdin
+        BLNE drain_stdin
 
         # call cpubexp(phi, e) to determine if e is valid
         # load phi_val -> r0, e_val -> r1
@@ -200,6 +221,8 @@ generateKeys:
         BL fopen
         # save file pointer in r5
         MOV r5, r0
+        CMP r5, #0
+        BEQ generateKeys_file_error
 
         # load n_val -> r4 and push onto the stack (to be used by fprint)
         LDR r4, =n_val
@@ -227,6 +250,10 @@ generateKeys:
         BL fclose
 
         # fall through to generateKeys_end
+    generateKeys_file_error:
+        LDR r0, =err_keys_file
+        BL  printf
+        @ fall through to generateKeys_end
     generateKeys_end:
         # pop the stack
         LDR r5, [sp, #8]
@@ -237,9 +264,14 @@ generateKeys:
 # END generate
 .global encryptMain
 encryptMain:
-    SUB  sp, sp, #4
+    SUB  sp, sp, #24
     STR  lr, [sp, #0]
- 
+    STR  r4, [sp, #4]
+    STR  r5, [sp, #8]
+    STR  r6, [sp, #12]
+    STR  r7, [sp, #16]
+    STR  r8, [sp, #20]
+
     # Prompt and read plaintext message
     LDR  r0, =prompt_message
     BL   printf
@@ -254,8 +286,17 @@ encryptMain:
  
     LDR  r0, =fmt_int
     LDR  r1, =val_e
-    BL   scanf 
- 
+    BL   scanf
+    CMP  r0, #1
+    # Flush bad input from stdin
+    BLNE drain_stdin
+
+    # Validate e > 0
+    LDR  r0, =val_e
+    LDR  r0, [r0]
+    CMP  r0, #1
+    BLE  encryptMain_invalid_e
+
     # Prompt and read modulus (n)
     LDR  r0, =prompt_n
     BL   printf 
@@ -263,7 +304,16 @@ encryptMain:
     LDR  r0, =fmt_int
     LDR  r1, =val_n
     BL   scanf
- 
+    CMP  r0, #1
+    # Flush bad input from stdin
+    BLNE drain_stdin
+
+    # Validate n > 0
+    LDR  r0, =val_n
+    LDR  r0, [r0]
+    CMP  r0, #0
+    BLE  encryptMain_invalid_n
+
     # Open encrypted.txt for writing
     LDR  r0, =enc_file_name
     LDR  r1, =mode_w
@@ -305,21 +355,37 @@ encryptMain:
     encryptMain_loop_done:
 
     # Close file
-    MOV  r0, r8
-    BL   fclose
+        MOV  r0, r8
+        BL   fclose
  
     # Print success message
-    LDR  r0, =enc_str_success
-    BL   printf
-    B    encryptMain_exit
+        LDR  r0, =enc_str_success
+        BL   printf
+        B    encryptMain_exit
 
-encryptMain_file_error:
-    LDR  r0, =err_enc_file
-    BL   printf
+    encryptMain_file_error:
+        LDR  r0, =err_enc_file
+        BL   printf
+        B    encryptMain_exit
 
-encryptMain_exit:
+    encryptMain_invalid_e:
+        LDR  r0, =err_invalid_e
+        BL   printf
+        B    encryptMain_exit
+
+    encryptMain_invalid_n:
+        LDR  r0, =err_invalid_n
+        BL   printf
+        B    encryptMain_exit
+
+    encryptMain_exit:
+    LDR  r8, [sp, #20]
+    LDR  r7, [sp, #16]
+    LDR  r6, [sp, #12]
+    LDR  r5, [sp, #8]
+    LDR  r4, [sp, #4]
     LDR  lr, [sp, #0]
-    ADD  sp, sp, #4
+    ADD  sp, sp, #24
     MOV  pc, lr
  
 #END encryptMain
@@ -327,9 +393,21 @@ encryptMain_exit:
 
 .global decryptMain
 decryptMain:
-    SUB  sp, sp, #4
+    SUB  sp, sp, #28
     STR  lr, [sp, #0]
- 
+    # r4 = d
+    STR  r4, [sp, #4]
+    # r5 = n
+    STR  r5, [sp, #8]
+    # r6 = count of decrypted chars
+    STR  r6, [sp, #12]
+    # r7 = unused, padding for alignment
+    STR  r7, [sp, #16]
+    # r8 = encrypted.txt file pointer
+    STR  r8, [sp, #20]
+    # r9 = plaintext.txt file pointer
+    STR  r9, [sp, #24]
+
     # Prompt and read private exponent (d)
     LDR  r0, =prompt_d
     BL   printf
@@ -337,37 +415,56 @@ decryptMain:
     LDR  r0, =fmt_int
     LDR  r1, =val_d
     BL   scanf
- 
-    # Prompt and read modulus (n)
-    LDR  r0, =prompt_n
-    BL   printf
- 
-    LDR  r0, =fmt_int
-    LDR  r1, =val_n
-    BL   scanf
- 
+    CMP  r0, #1
+    # Flush bad input from stdin
+    BLNE drain_stdin
+
+    # Validate d > 0
+    LDR  r0, =val_d
+    LDR  r0, [r0]
+    CMP  r0, #0
+    BLE  decryptMain_invalid_d
+
     # Open encrypted.txt for reading
     LDR  r0, =enc_file_name
     LDR  r1, =mode_r
     BL   fopen
     MOV  r8, r0
- 
+    CMP  r8, #0
+    BEQ  decryptMain_file_enc_error
+
+    # Prompt and read modulus (n)
+    LDR  r0, =prompt_n
+    BL   printf
+
+    LDR  r0, =fmt_int
+    LDR  r1, =val_n
+    BL   scanf
+    CMP  r0, #1
+    # Flush bad input from stdin
+    BLNE drain_stdin
+
+    # Validate n > 0
+    LDR  r5, =val_n
+    LDR  r5, [r5]
+    CMP  r5, #0
+    BLE  decryptMain_invalid_n
+
     # Open plaintext.txt for writing
     LDR  r0, =plain_file_name
     LDR  r1, =mode_w
     BL   fopen
     MOV  r9, r0
- 
+    CMP  r9, #0
+    BEQ  decryptMain_file_plain_error
+
     # Load d and n
     LDR  r4, =val_d
     LDR  r4, [r4]
- 
-    LDR  r5, =val_n
-    LDR  r5, [r5]
- 
-    # Loop: read each space-delimited integer from encrypted.txt (input int array),
-    # compute m = c^d mod n, write ASCII char to plaintext.txt (output char array)
-    # r4 = d, r5 = n, r8 = encrypted.txt fp, r9 = plaintext.txt fp
+    MOV  r6, #0
+
+    # Loop: read each space-delimited integer from encrypted.txt,
+    # compute m = c^d mod n, write ASCII char to plaintext.txt
     decryptMain_loop:
         # r8 file pointer (encrypted.txt)
         MOV  r0, r8
@@ -390,31 +487,78 @@ decryptMain:
         #fputc(int c, FILE *stream): r0=char, r1=file pointer
         MOV  r1, r9
         BL   fputc
+        # Increment count
+        ADD  r6, r6, #1
         B    decryptMain_loop
     decryptMain_done:
+        CMP  r6, #0
+        BEQ  decryptMain_empty_cipher
+        MOV  r0, r8
+        BL   fclose
+        MOV  r0, r9
+        BL   fclose
+        LDR  r0, =dec_str_success
+        BL   printf
+        B    decryptMain_exit
 
-    # Close files
-    MOV  r0, r8
-    BL   fclose
- 
-    MOV  r0, r9
-    BL   fclose
- 
-    # Print success message
-    LDR  r0, =dec_str_success
-    BL   printf
- 
+    decryptMain_empty_cipher:
+        MOV  r0, r8
+        BL   fclose
+        MOV  r0, r9
+        BL   fclose
+        LDR  r0, =err_empty_cipher
+        BL   printf
+        B    decryptMain_exit
+
+    decryptMain_file_enc_error:
+        LDR  r0, =err_dec_enc_file
+        BL   printf
+        B    decryptMain_exit
+
+    decryptMain_file_plain_error:
+        MOV  r0, r8
+        BL   fclose
+        LDR  r0, =err_dec_plain_file
+        BL   printf
+        B    decryptMain_exit
+
+    decryptMain_invalid_d:
+        LDR  r0, =err_invalid_d
+        BL   printf
+        B    decryptMain_exit
+
+    decryptMain_invalid_n:
+        MOV  r0, r8
+        BL   fclose
+        LDR  r0, =err_invalid_n
+        BL   printf
+        B    decryptMain_exit
+
+    decryptMain_exit:
+    LDR  r9, [sp, #24]
+    LDR  r8, [sp, #20]
+    LDR  r7, [sp, #16]
+    LDR  r6, [sp, #12]
+    LDR  r5, [sp, #8]
+    LDR  r4, [sp, #4]
+    LDR  lr, [sp, #0]
+    ADD  sp, sp, #28
+    MOV  pc, lr
+
+#END decryptMain
+
+@ Drain stdin until newline — call after a failed scanf to prevent infinite loops
+.global drain_stdin
+drain_stdin:
+    SUB  sp, sp, #4
+    STR  lr, [sp, #0]
+drain_stdin_loop:
+    BL   getchar
+    CMP  r0, #10            @ '\n'
+    BNE  drain_stdin_loop
     LDR  lr, [sp, #0]
     ADD  sp, sp, #4
     MOV  pc, lr
- 
-    # TODOs:
-    # Error if file not found
-    # Error if file is empty
-    # Check for valid inputs
-    # Write d, n to encrypted.txt as well?
-
-#END decryptMain
 
 .data
     # Shared
@@ -426,13 +570,16 @@ decryptMain:
     enc_file_name:      .asciz "data/encrypted.txt"
     plain_file_name:    .asciz "data/plaintext.txt"
     keys_file_name:    .asciz "data/keys.txt"
-    message_buf:        .skip 100
+    message_buf:        .skip 128
 
     # Main menu
     menu_prompt:        .asciz "\nRSA Menu:\n  1. Generate Keys\n  2. Encrypt a Message\n  3. Decrypt a Message\n  4. Exit\nEnter choice: "
     menu_invalid:       .asciz "Invalid choice. Please enter 1, 2, 3 or 4.\n"
     menu_choice:        .word 0
  
+    # n written as first token in encrypted.txt
+    fmt_n_out:          .asciz "%d "
+
     # Generate Keys
     prompt_p:           .asciz "Enter a prime value for p: "
     prompt_q:           .asciz "Enter a prime value for q: "
@@ -451,16 +598,25 @@ decryptMain:
     prompt_message:     .asciz "Enter plaintext message: \n"
     prompt_e:           .asciz "Enter public key exponent (e): \n"
     val_e:              .word 0
-    fmt_enc_out:        .asciz "%d "    @ space-separated integer format for output array
-    enc_str_success:    .asciz "Encryption Complete. Output written to encrypted.txt.\n"
-    err_enc_file:       .asciz "Error: could not open encrypted.txt for writing. Check data/ directory exists.\n"
- 
+    #space-separated ciphertext integers
+    fmt_enc_out:        .asciz "%d "
+    enc_str_success:    .asciz "Encryption Complete. Output written to data/encrypted.txt.\n"
+    err_enc_file:       .asciz "Error: could not open data/encrypted.txt for writing. Check data/ directory exists.\n"
+    err_invalid_e:      .asciz "Error: e must be greater than 1.\n"
+    err_invalid_n:      .asciz "Error: n must be greater than 0.\n"
+
     # Decrypt
     prompt_d:           .asciz "Enter private key exponent (d): \n"
     val_d:              .word 0
     val_n:              .word 0
-    dec_str_success:    .asciz "Decryption Complete. Output written to plaintext.txt."
-    #scratch word for fscanf
+    dec_str_success:    .asciz "Decryption complete. Output written to data/plaintext.txt.\n"
+    err_dec_enc_file:   .asciz "Error: could not open data/encrypted.txt for reading. Encrypt a message first.\n"
+    err_dec_plain_file: .asciz "Error: could not open data/plaintext.txt for writing. Check data/ directory exists.\n"
+    err_empty_file:     .asciz "Error: data/encrypted.txt is empty or contains no valid data.\n"
+    err_empty_cipher:   .asciz "Error: data/encrypted.txt contained no ciphertext integers.\n"
+    err_invalid_d:      .asciz "Error: d must be greater than 0.\n"
+    err_keys_file:      .asciz "Error: could not open data/keys.txt for writing. Check data/ directory exists.\n"
+    # scratch word for fscanf
     temp_val:           .word 0
  
 # END RSA.s
