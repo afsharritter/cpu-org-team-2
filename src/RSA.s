@@ -147,8 +147,17 @@ generateKeys:
         LDR r0, [r0]
         LDR r1, =q_val
         LDR r1, [r1]
+        CMP r0, r1
+        BEQ generateKeys_phi_equal
+        # p != q: phi = (p-1)*(q-1)
         BL calcPhi
-        # calcPhi return phi in r0, store it in the phi_val variable
+        B  generateKeys_phi_store
+        # special case when p=q
+        generateKeys_phi_equal:
+            # p == q: phi = p*(p-1)
+            BL calcPhiEqual
+    generateKeys_phi_store:
+        # store phi result in phi_val
         LDR r1, =phi_val
         STR r0, [r1]
 
