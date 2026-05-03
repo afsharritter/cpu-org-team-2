@@ -160,6 +160,9 @@ generateKeys:
         # calcN returns n in r0, store it in the n_val variable
         LDR r1, =n_val
         STR r0, [r1]
+        # check if n > 127
+        CMP r0, #127
+        BLE generateKeys_invalid_n
 
         # Fall through to generateKeys_calculate_phi
     generateKeys_calculate_phi:
@@ -273,6 +276,11 @@ generateKeys:
         # branch to generateKeys_end
         B  generateKeys_end
 
+    generateKeys_invalid_n:
+        LDR r0, =err_invalid_n
+        BL  printf
+        B generateKeys_prompt_p_loop
+        
     generateKeys_file_error:
         LDR r0, =err_keys_file
         BL  printf
@@ -345,10 +353,10 @@ encryptMain:
     # Flush bad input from stdin
     BLNE drain_stdin
 
-    # Validate n > 0
+    # Validate n > 127
     LDR  r0, =val_n
     LDR  r0, [r0]
-    CMP  r0, #0
+    CMP  r0, #127
     BLE  encryptMain_invalid_n
 
     # Open encrypted.txt for writing
@@ -488,10 +496,10 @@ decryptMain:
     # Flush bad input from stdin
     BLNE drain_stdin
 
-    # Validate n > 0
+    # Validate n > 127
     LDR  r5, =val_n
     LDR  r5, [r5]
-    CMP  r5, #0
+    CMP  r5, #127
     BLE  decryptMain_invalid_n
 
     # Open plaintext.txt for writing
@@ -652,7 +660,7 @@ drain_stdin_loop:
     enc_str_success:    .asciz "Encryption Complete. Output written to data/encrypted.txt.\n"
     err_enc_file:       .asciz "Error: could not open data/encrypted.txt for writing. Check data/ directory exists.\n"
     err_invalid_e:      .asciz "Error: e must be greater than 1.\n"
-    err_invalid_n:      .asciz "Error: n must be greater than 0.\n"
+    err_invalid_n:      .asciz "Error. n is too small and will not allow for successful encryption or decryption. n should be greater than 127. \n"
 
     # Decrypt
     prompt_d:           .asciz "Enter private key exponent (d): \n"
