@@ -27,11 +27,5 @@ $(BIN)/run_tests_RSALib: $(BIN)/test_RSALib.o $(BIN)/RSALib.o
 $(BIN)/test_RSALib.o: $(TESTS)/test_RSALib.s
 	gcc -c $(TESTS)/test_RSALib.s -o $(BIN)/test_RSALib.o
 
-$(BIN)/run_tests_cpubexp: $(BIN)/test_cpubexp.o $(BIN)/RSALib.o
-	gcc $(BIN)/test_cpubexp.o $(BIN)/RSALib.o -o $(BIN)/run_tests_cpubexp
-
-$(BIN)/test_cpubexp.o: $(TESTS)/test_cpubexp.s
-	gcc -c $(TESTS)/test_cpubexp.s -o $(BIN)/test_cpubexp.o
-
 clean:
 	rm -rf $(BIN)/*

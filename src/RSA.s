@@ -55,7 +55,7 @@ main:
         B   main_loop
 
     main_generate_keys:
-        # TODO: Generate keys — prompt for p, q, e; call cpubexp/cprivexp; save to keys.txt
+        # generate public and private keys
         BL generateKeys
         B main_loop
 

@@ -190,6 +190,15 @@ isPrime:
     POP {r4, r5, pc}
 #END OF isPrime
 
+#
+# Function Name: calcN
+# Purpose: Function to calculate modulus n.
+# Inputs:
+#   - r0: p
+#   - r1: q
+# Outputs:
+#   - r0: n
+#
 calcN:
     # push the stack
     SUB sp, sp, #4
@@ -203,6 +212,15 @@ calcN:
     MOV pc, lr
 #END calc_n
 
+#
+# Function Name: calcPhi
+# Purpose: Function to calculate Euler totient phi.
+# Inputs:
+#   - r0: p
+#   - r1: q
+# Outputs:
+#   - r0: phi
+#
 calcPhi:
     # push the stack
     SUB sp, sp, #4
@@ -220,6 +238,15 @@ calcPhi:
     MOV pc, lr
 #END calc_phi
 
+#
+# Function Name: calcPhiEqual
+# Purpose: Function to calculate phi when p and q are equal.
+# Inputs:
+#   - r0: p
+#   - r1: q
+# Outputs:
+#   - r0: phi
+#
 calcPhiEqual:
     SUB sp, sp, #4
     STR lr, [sp, #0]
@@ -232,7 +259,15 @@ calcPhiEqual:
     MOV pc, lr
 #END calcPhiEqual
 
-
+#
+# Function Name: cprivexp
+# Purpose: Function to calculate private exponent, d.
+# Inputs:
+#   - r0: e
+#   - r1: phi
+# Outputs:
+#   - r0: d
+#
 cprivexp:
     @ Push the stack
     SUB sp, sp, #8
@@ -250,7 +285,15 @@ cprivexp:
     MOV pc, lr
 #END cprivexp
 
-
+#
+# Function Name: modinv
+# Purpose: Function to calculate modular inverse.
+# Inputs:
+#   - r0: e
+#   - r1: phi
+# Outputs:
+#   - r0: modular inverse
+#
 modinv:
 
     @ Push the stack
@@ -341,6 +384,15 @@ modinv:
 
 #END modinv
 
+#
+# Function Name: cpubexp
+# Purpose: Function to calculate public exponent.
+# Inputs:
+#   - r0: phi
+#   - r1: e
+# Outputs:
+#   - r0: status code
+#
 cpubexp:
     # push the stack
     SUB sp, sp, #4
@@ -395,6 +447,15 @@ cpubexp:
     MOV pc, lr
 
 .text
+#
+# Function Name: gcd
+# Purpose: Function to calculate the greatest common divisor of two numbers.
+# Inputs:
+#   - r0: num1
+#   - r1: num2
+# Outputs:
+#   - r0: greatest common divisor
+#
 gcd:
     # push the stack
     SUB sp, sp, #4
