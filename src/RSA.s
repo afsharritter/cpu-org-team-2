@@ -270,7 +270,9 @@ generateKeys:
         MOV r0, r5
         BL fclose
 
-        # fall through to generateKeys_end
+        # branch to generateKeys_end
+        B  generateKeys_end
+
     generateKeys_file_error:
         LDR r0, =err_keys_file
         BL  printf
